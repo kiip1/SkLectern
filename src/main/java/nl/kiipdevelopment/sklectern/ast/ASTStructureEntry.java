@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
-public record ASTStructureEntry<T>(int indentation, String key, T value) implements ASTStatement {
+public record ASTStructureEntry<T>(String key, T value) implements ASTStatement {
     @Override
     public void check(Context context) {
         if (value instanceof ASTNode node)

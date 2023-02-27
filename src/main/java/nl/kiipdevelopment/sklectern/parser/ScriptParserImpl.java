@@ -88,7 +88,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
                 return new ASTStruct(builder.toString(), entries);
             } else { // Trigger
-                return new ASTStruct(builder.toString(), List.of(new ASTStructureEntry<>(offset, null, statementList())));
+                return new ASTStruct(builder.toString(), List.of(new ASTStructureEntry<>(null, statementList())));
             }
         }
 
@@ -117,15 +117,14 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         }
 
         private @NotNull ASTStructureEntry<?> entry() {
-            int offset = indent();
             String key = current.value();
             eat(TokenType.IDENTIFIER);
             eat(TokenType.COLON);
             ASTNode node = element(List.of(TokenType.END));
 
             if (key.equals("trigger"))
-                return new ASTStructureEntry<>(offset, key, statementList());
-            return new ASTStructureEntry<>(offset, key, node);
+                return new ASTStructureEntry<>(key, statementList());
+            return new ASTStructureEntry<>(key, node);
         }
 
         private @NotNull ASTStatementList statementList() {
