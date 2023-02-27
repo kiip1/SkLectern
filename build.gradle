@@ -1,0 +1,30 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+}
+
+version = '1.0.0'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    implementation 'io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.19:2.29.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+processResources {
+    filter ReplaceTokens, tokens: ["version": version]
+}

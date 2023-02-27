@@ -1,0 +1,5 @@
+name: SkLectern
+main: nl.kiipdevelopment.sklectern.BukkitSkLectern
+version: @version@
+author: Kiip
+api-version: 1.19
