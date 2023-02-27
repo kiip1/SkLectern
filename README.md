@@ -20,19 +20,19 @@ Macros need to end with a ! and unlike functions they don't have types for argum
 The syntax to use macros is as follows:
 ```vb
 command /test:
-    trigger:
-        chance!(broadcast "hi", 0.5)
+  trigger:
+    chance!(broadcast "hi", 0.5)
 
 macro chance!(statement, chance):
-    if chance of $chance:
-        $statement
+  if chance of $chance:
+    $statement
 ```
 With as result:
 ```vb
 command /test:
-	trigger:
-		if chance of 0.5:
-			broadcast "hi"
+  trigger:
+    if chance of 0.5:
+      broadcast "hi"
 ```
 
 Structures are also supported:
@@ -41,25 +41,25 @@ item!(dirt, 5 seconds)
 item!(stone, 10 seconds)
 
 structure macro item!(item, cooldown):
-    command /$item:
-        cooldown: $cooldown
-        cooldown message: &cWait a little longer before getting another item!
-        trigger:
-            give $item to player
+  command /$item:
+    cooldown: $cooldown
+    cooldown message: &cWait a little longer before getting another item!
+    trigger:
+      give $item to player
 ```
 With as result:
 ```vb
 command /dirt:
-	cooldown: 5 seconds
-	cooldown message: &cWait a little longer before getting another item!
-	trigger:
-		give dirt to player
+  cooldown: 5 seconds
+  cooldown message: &cWait a little longer before getting another item!
+  trigger:
+    give dirt to player
 
 command /stone:
-	cooldown: 10 seconds
-	cooldown message: &cWait a little longer before getting another item!
-	trigger:
-		give stone to player
+  cooldown: 10 seconds
+  cooldown message: &cWait a little longer before getting another item!
+  trigger:
+    give stone to player
 ```
 
 ## Goals
