@@ -9,20 +9,38 @@ allprojects {
     description = "Supercharge your scripts with various new language features and performance gains"
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+subprojects {
+    apply(plugin = "java")
+    apply(plugin = "com.github.johnrengelman.shadow")
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+
+    tasks {
+        shadowJar {
+            archiveBaseName.set(project.name)
+            mergeServiceFiles()
+            minimize()
+        }
+
+        build {
+            dependsOn(shadowJar)
+        }
     }
 }
 
 tasks {
-    shadowJar {
-        archiveBaseName.set(project.name)
-        mergeServiceFiles()
-        minimize()
-    }
-
     build {
-        dependsOn(shadowJar)
+        doLast {
+            subprojects.forEach {
+                copy {
+                    from(it.buildDir)
+                    into(rootProject.buildDir)
+                }
+            }
+        }
     }
 }
