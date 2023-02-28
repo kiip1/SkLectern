@@ -13,20 +13,14 @@ import java.nio.file.Files;
 
 @ApiStatus.Experimental
 public final class BukkitSkLectern extends JavaPlugin implements SkLectern {
-    private static SkLectern instance;
-
-    public static SkLectern instance() {
-        return instance;
-    }
-
-    private final @NotNull Config config;
+    private final Config config;
     private ScriptManager scriptManager;
 
     public BukkitSkLectern(@NotNull JavaPluginLoader loader, @NotNull PluginDescriptionFile description,
                            @NotNull File dataFolder, @NotNull File file) {
 
         super(loader, description, dataFolder, file);
-        instance = this;
+        SkLectern.setInstance(this);
         config = new Config(
                 getDataFolder().toPath().resolve("scripts"),
                 getDataFolder().toPath().resolve("dist"),
@@ -36,6 +30,7 @@ public final class BukkitSkLectern extends JavaPlugin implements SkLectern {
 
     public BukkitSkLectern() {
         super();
+        SkLectern.setInstance(this);
         config = new Config(
                 getDataFolder().toPath().resolve("scripts"),
                 getDataFolder().toPath().resolve("dist"),
