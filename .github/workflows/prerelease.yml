@@ -25,5 +25,5 @@ jobs:
                   prerelease: true
                   title: "Development Build"
                   files: |
-                      build/distributions/sklectern-cli-shadow-*.jar
+                      build/distributions/sklectern-cli-shadow-*
                       build/libs/sklectern-bukkit-*-all.jar
