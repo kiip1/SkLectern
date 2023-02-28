@@ -1,6 +1,5 @@
 package nl.kiipdevelopment.sklectern.lexer;
 
-import com.google.common.collect.Queues;
 import com.google.common.math.IntMath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 record ScriptLexerImpl(String script) implements ScriptLexer {
 	@Override
 	public @NotNull Instance instance() {
-		return new InstanceImpl(Queues.newArrayDeque(script
+		return new InstanceImpl(new ArrayDeque<>(script
                 .replaceAll("(?<!#)#(?!#).*", "")
                 .replaceAll("(?m)^[ \\t]*\\r?\\n", "").chars()
 				.mapToObj(integer -> (char) integer)
