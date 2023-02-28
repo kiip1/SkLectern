@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     group = "nl.kiipdevelopment"
-    version = "1.0.0"
+    version = "1.0.1-alpha"
     description = "Supercharge your scripts with various new language features and performance gains"
 }
 
