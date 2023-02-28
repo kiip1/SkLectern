@@ -1,7 +1,6 @@
 import be.seeseemelk.mockbukkit.MockBukkit;
 import nl.kiipdevelopment.sklectern.BukkitSkLectern;
 import nl.kiipdevelopment.sklectern.Script;
-import nl.kiipdevelopment.sklectern.SkLectern;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,8 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 final class TestTransform {
     @BeforeAll
@@ -29,15 +26,6 @@ final class TestTransform {
     @AfterAll
     public static void unload() {
         MockBukkit.unmock();
-    }
-
-    @Test
-    public void testTransform() throws IOException {
-        final Path distributionFolder = SkLectern.instance().config().distributionFolder();
-        SkLectern.instance().scriptManager().transformAll();
-
-        System.out.println(new Script(SkLectern.instance().config().scriptFolder().resolve("test.lsk")).parse());
-        System.out.println(Files.readString(distributionFolder.resolve("test.l.sk")));
     }
 
     @Test
