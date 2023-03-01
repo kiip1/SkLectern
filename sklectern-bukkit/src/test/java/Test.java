@@ -6,8 +6,6 @@ import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 final class Test {
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -21,12 +19,18 @@ final class Test {
 
         MockBukkit.load(BukkitSkLectern.class);
 
-        ScriptLexer.of(new Script(SkLectern.instance().config().scriptFolder().resolve("arithmetic.lsk")).source()).instance().iterator().forEachRemaining(System.out::println);
+        final Script script = new Script(SkLectern.instance()
+                .config()
+                .scriptFolder()
+                .resolve("test.lsk"));
 
-        final Path distributionFolder = SkLectern.instance().config().distributionFolder();
-        SkLectern.instance().scriptManager().transformAll();
-        System.out.println(new Script(SkLectern.instance().config().scriptFolder().resolve("arithmetic.lsk")).parse());
-        System.out.println(Files.readString(distributionFolder.resolve("arithmetic.l.sk")));
+        ScriptLexer.of(script.source())
+                .instance()
+                .iterator()
+                .forEachRemaining(System.out::println);
+
+        System.out.println(script.parse());
+        System.out.println(script.transform());
 
         MockBukkit.unmock();
     }

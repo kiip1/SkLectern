@@ -1,6 +1,7 @@
 package nl.kiipdevelopment.sklectern.lexer;
 
 import com.google.common.math.IntMath;
+import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +40,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		private Token peek;
 		@Nullable
 		private TokenType previous;
+		private Spacing spacing;
 
 		private InstanceImpl(@NotNull Deque<Character> chars) {
 			this.chars = chars;
@@ -47,21 +49,26 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 
 		@Override
 		public @NotNull Token next() {
+			return next(Spacing.NONE);
+		}
+
+		private @NotNull Token next(Spacing spacing) {
+			this.spacing = spacing;
 			peek = null;
 			Character next = chars.peek();
 			if (next == null) {
 				previous = TokenType.END;
-				return new Token(TokenType.END, "");
+				return new Token(TokenType.END, "", spacing);
 			}
 			if (next == '\n') {
 				chars.poll();
 				previous = TokenType.END;
-				return new Token(TokenType.END, "");
+				return new Token(TokenType.END, "", spacing);
 			}
 
             if (next == ' ' && previous != TokenType.END) {
                 chars.poll();
-                return next();
+                return next(spacing.left());
             }
 
             if (previous == TokenType.END && (next == ' ' || next == '\t'))
@@ -86,7 +93,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 			if (tokenType != null) {
 				chars.poll();
 				previous = tokenType;
-				return new Token(tokenType, next.toString());
+				return new Token(tokenType, next.toString(), spacing);
 			}
 
 			previous = TokenType.IDENTIFIER;
@@ -143,7 +150,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 			while (!chars.isEmpty() && (chars.peek() == ' ' || chars.peek() == '\t'))
 				result.append(chars.poll());
 
-			return new Token(TokenType.INDENT, result.toString());
+			return new Token(TokenType.INDENT, result.toString(), spacing);
 		}
 
 		private @NotNull Token number() {
@@ -161,7 +168,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
                 result.append(chars.poll());
             }
 
-			return new Token(TokenType.NUMBER, result.toString());
+			return new Token(TokenType.NUMBER, result.toString(), spacing);
 		}
 
 		private @NotNull Token identifier() {
@@ -169,7 +176,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 			do result.append(chars.poll());
 			while (!chars.isEmpty() && chars.peek() != '\n' && chars.peek() != ' ' && !Character.isDigit(chars.peek()) && TokenType.noAssociatedValue(chars.peek()));
 
-			return new Token(TokenType.IDENTIFIER, result.toString());
+			return new Token(TokenType.IDENTIFIER, result.toString(), spacing);
 		}
 
 		private @NotNull Token string() {
@@ -179,7 +186,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 				result.append(chars.poll());
 			chars.poll();
 
-			return new Token(TokenType.STRING, "\"" + result + "\"");
+			return new Token(TokenType.STRING, "\"" + result + "\"", spacing);
 		}
 
         private @NotNull Token variable() {
@@ -189,7 +196,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
                 result.append(chars.poll());
             chars.poll();
 
-            return new Token(TokenType.VARIABLE, "{" + result + "}");
+            return new Token(TokenType.VARIABLE, "{" + result + "}", spacing);
         }
 	}
 }

@@ -4,6 +4,7 @@ import nl.kiipdevelopment.sklectern.ast.*;
 import nl.kiipdevelopment.sklectern.ast.ASTBinaryOperator.BinaryOperator;
 import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 import nl.kiipdevelopment.sklectern.lexer.Token;
+import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
 import nl.kiipdevelopment.sklectern.lexer.TokenType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,8 +35,8 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private final @NotNull ScriptParser parser;
         private final ScriptLexer.Instance lexer;
         private final int indentationPerScopeLevel;
-        private Token current = new Token(TokenType.END, "");
-        private Token previous = new Token(TokenType.END, "");
+        private Token current = new Token(TokenType.END, "", Spacing.NONE);
+        private Token previous = new Token(TokenType.END, "", Spacing.NONE);
         private int indentation;
         private boolean finished = false;
 
@@ -78,10 +79,9 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             StringBuilder builder = new StringBuilder();
             while (!(current.type() == TokenType.COLON && peek().type() == TokenType.END)) {
-                builder.append(current.value()).append(" ");
+                builder.append(current.spaced());
                 next();
             }
-            builder.deleteCharAt(builder.length() - 1);
             eat(TokenType.COLON);
             eat(TokenType.END);
 
@@ -233,7 +233,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                         current.type() == TokenType.PLUS ||
                         current.type() == TokenType.MINUS) nodes.add(sum());
                 else {
-                    nodes.add(new ASTString(current.value()));
+                    nodes.add(new ASTString(current.spaced()));
                     next();
                 }
             }
@@ -253,7 +253,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         }
 
         private void next() {
-            if (finished) throw new ParseException("EOF reached");
+            if (finished) throw new ParseException(lexer, parser.script(), "EOF reached");
             if (current.type() == TokenType.END && !lexer.hasNext()) finished = true;
             previous = current;
             current = lexer.next();

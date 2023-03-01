@@ -25,8 +25,7 @@ public final class ScriptManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {
-            if (config.testing()) throw e;
-            else System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
