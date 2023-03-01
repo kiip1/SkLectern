@@ -15,6 +15,12 @@ public enum TokenType {
     VARIABLE,
     IDENTIFIER,
 
+    PLUS('+'),
+    MINUS('-'),
+    MULTIPLY('*'),
+    DIVIDE('/'),
+    EXPONENT('^'),
+
     PARENTHESIS_OPEN('('),
     PARENTHESIS_CLOSE(')'),
     CURLY_OPEN('{'),

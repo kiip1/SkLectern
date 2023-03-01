@@ -1,0 +1,27 @@
+on join:
+    send "Test"
+
+command /test:
+    permission: sklectern.dev
+    trigger:
+        send test()
+        play sound "block.note_block.basedrum" to all players
+        debug!("hello", "sklectern.dev")
+        chance!(broadcast "hi", 0.5)
+
+item!(dirt, 5 seconds)
+item!(stone, 10 seconds)
+
+macro debug!(message, permission):
+    send $message to all players where [input has permission $permission]
+
+macro chance!(statement, chance):
+    if chance of $chance:
+        $statement
+
+structure macro item!(item, cooldown):
+    command /$item:
+        cooldown: $cooldown
+        cooldown message: &cWait a little longer before getting another item!
+        trigger:
+            give $item to player

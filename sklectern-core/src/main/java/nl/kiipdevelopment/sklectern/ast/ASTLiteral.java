@@ -1,15 +1,16 @@
 package nl.kiipdevelopment.sklectern.ast;
 
 import nl.kiipdevelopment.sklectern.context.Context;
-import org.jetbrains.annotations.ApiStatus;
 
-@ApiStatus.Internal
-public record ASTLiteral(String value) implements ASTNode {
-    @Override
-    public void check(Context context) {}
+public interface ASTLiteral<T> extends ASTNode {
+    T value();
+
+    default String visit() {
+        return value().toString();
+    }
 
     @Override
-    public String visit(Context context) {
-        return value;
+    default String visit(Context context) {
+        return visit();
     }
 }

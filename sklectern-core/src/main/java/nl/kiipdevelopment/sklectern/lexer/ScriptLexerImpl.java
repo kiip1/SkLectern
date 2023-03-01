@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 record ScriptLexerImpl(String script) implements ScriptLexer {
@@ -58,13 +59,15 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 				return new Token(TokenType.END, "");
 			}
 
-			if (previous == TokenType.END && (next == ' ' || next == '\t'))
+            if (next == ' ' && previous != TokenType.END) {
+                chars.poll();
+                return next();
+            }
+
+            if (previous == TokenType.END && (next == ' ' || next == '\t'))
 				return indent();
 
-			chars.poll();
-			Character digitPeek = chars.peek();
-			chars.addFirst(next);
-			if (digitPeek != null && ((next == '-' && Character.isDigit(digitPeek)) || Character.isDigit(next))) {
+			if (Character.isDigit(next)) {
 				previous = TokenType.NUMBER;
 				return number();
 			}
@@ -145,8 +148,18 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 
 		private @NotNull Token number() {
 			StringBuilder result = new StringBuilder();
-			while (!chars.isEmpty() && (chars.peek() == '-' || Character.isDigit(chars.peek())))
-				result.append(chars.poll());
+            boolean decimal = false;
+            if (Objects.equals(chars.peek(), '-'))
+                result.append(chars.poll());
+
+			while (!chars.isEmpty()) {
+                if (!decimal && chars.peek() == '.') {
+                    decimal = true;
+                    result.append(chars.poll());
+                } else if (!Character.isDigit(chars.peek())) break;
+
+                result.append(chars.poll());
+            }
 
 			return new Token(TokenType.NUMBER, result.toString());
 		}
@@ -154,7 +167,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		private @NotNull Token identifier() {
 			StringBuilder result = new StringBuilder();
 			do result.append(chars.poll());
-			while (!chars.isEmpty() && chars.peek() != '\n' && TokenType.noAssociatedValue(chars.peek()));
+			while (!chars.isEmpty() && chars.peek() != '\n' && chars.peek() != ' ' && !Character.isDigit(chars.peek()) && TokenType.noAssociatedValue(chars.peek()));
 
 			return new Token(TokenType.IDENTIFIER, result.toString());
 		}

@@ -1,6 +1,7 @@
 package nl.kiipdevelopment.sklectern;
 
 import nl.kiipdevelopment.sklectern.context.Config;
+import nl.kiipdevelopment.sklectern.parser.ParseException;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,9 @@ public final class ScriptManager {
                     .parallel().forEach(this::transform);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (ParseException e) {
+            if (config.testing()) throw e;
+            else System.err.println(e.getMessage());
         }
     }
 

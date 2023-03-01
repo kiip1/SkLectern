@@ -1,27 +1,323 @@
-on join:
-    send "Test"
-
-command /test:
-    permission: sklectern.dev
+on chat:
+	cancel event
+	set {variable} to message
+	set {variable} to split {variable} at ""
+	if {variable} is "@":
+		delete {variable}
+		set {variable} to join {variable} with ""
+		staffMsg(player, {variable})
+		stop
+	if {variable} is true:
+		stop
+	if {variable} is "party":
+		stop
+	if {variable} is true:
+		stop
+	if {variable} is true:
+		stop
+	if {variable} is set:
+		if {variable} is set:
+			broadcast "&6[&f%{variable}%&6] &f%nickname of player%&f: §%{variable}%%message%"
+			stop
+		broadcast "&6[&f%{variable}%&6] &f%nickname of player%&f: %message%"
+		stop
+	if {variable} is set:
+		broadcast "&f%nickname of player%&f: §%{variable}%%message%"
+		stop
+	broadcast "&f%nickname of player%&f: %message%"
+command /chattitle [<offline player>] [<text>] [<text>]:
+	permission: admin
+	usage: /chattitle <player> <set/remove> <title>
+	aliases: /ct
+	trigger:
+		if arg 1 is not set:
+			message "{variable}Please use &d/chattitle <player> <set/remove> <title>"
+			stop
+		if arg 1 is set:
+			if arg 2 is not set:
+				message "{variable}Please use &d/chattitle <player> <set/remove> <title>"
+				stop
+			if arg 2 is set:
+				if arg 3 is not set:
+					if arg 2 is "remove":
+						delete {variable}
+						message "{variable}Removed &d%arg 1%&b's title!"
+					else:
+						message "{variable}Please use &d/chattitle <player> <set/remove> <title>"
+						stop
+				if arg 3 is set:
+					if arg 2 is "set":
+						set {variable} to arg 3
+						replace every "&" with "§" in {variable}
+						set {variable} to {variable}
+						message "{variable}&d%arg 1%&b's prefix set to &d%{variable}%&b!"
+					if arg 2 is "remove":
+						reset {variable}
+						message "{variable}Removed &d%arg 1%&b's title!"
+command /stafflist:
+	trigger:
+		loop all bungeecord players:
+			set {variable} to loop-value parsed as a offline player
+			delete {variable}
+			execute "select * from server_inheritance" in {variable} and store the result in {variable}
+			loop {variable}:
+				"%{variable}%" is "%uuid of {variable}%"
+				set {variable} to loop-index
+			set {variable} to "%{variable}%}%"
+			delete {variable}
+			delete {variable}
+			execute "select * from server_permissions" in {variable} and store the result in {variable}
+			set {variable} to false
+			loop {variable}:
+				"%{variable}%" is "%{variable}%"
+				"%{variable}%" is "rank-ladder"
+				"%{variable}%" is "Staff" or "Owner"
+				set {variable} to true
+			if {variable} is true:
+				set {variable} to uuid of "%loop-value%" parsed as a offline player
+				set {variable} to "%loop-value%"
+				if global {variable}%} is true:
+					set {variable} to false
+				else:
+					set {variable} to true
+				{variable} is true
+				set {variable} to "%current bungeecord server of player {variable}%"
+				add loop-value to {variable::*}
+		message "{variable}Staff online:"
+		loop all bungeecord servers:
+			set {variable} to loop-value
+			replace every "lobby" in {variable} with "hub"
+			set {variable} to split {variable} at ""
+			set {variable} to split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" at ""
+			set {variable} to split "abcdefghijklmnopqrstuvwxyz" at ""
+			loop {variable}:
+				"%{variable}%" is "%loop-value-2%"
+				set {variable} to {variable}
+			set {variable} to join {variable} with ""
+			if {variable} is not set:
+				message "&b%{variable}%: &dNo staff!"
+			else:
+				message "&b%{variable}%: &d%{variable}%"
+command /onlinestat <offline player>:
+	usage: /onlinestat <player>
+	aliases: /os
+	trigger:
+		if arg 1 is online:
+			set {variable} to "&aonline &6since %{variable}%"
+			set {variable} to true
+		if arg 1 is offline:
+			set {variable} to "&4offline &6since %{variable}%"
+			set {variable} to false
+		if {variable} is true:
+			set {variable} to "&4offline &6since %{variable}%"
+			set {variable} to false
+		message "&7&m--------------------------------------"
+		message ""
+		message "{variable}%arg 1% &6is %{variable}%"
+		message ""
+		message "&7&m--------------------------------------"
+command /msg [<offline player>] [<text>]:
+	trigger:
+		if arg-2 is not set:
+			message "{variable}Usage: &d/msg <Player> <Message>"
+			stop
+		if all of the bungeecord players does not contain "%arg-1%":
+			message "{variable}That player isn't online!"
+			stop
+		if bungeecord "%arg-1%" is not online:
+			message "{variable}That player isn't online!"
+			stop
+		if "%arg-1%" is "%player%":
+			message "{variable}You can't message yourself!"
+			stop
+		set {variable} to "{variable}"
+		replace every "<sender>" in {variable} with "%player%"
+		replace every "<receiver>" in {variable} with "%arg-1%"
+		replace every "<message>" in {variable} with "%arg-2%"
+		message "%{variable}%" to bungeecord player "%arg-1%"
+		set {variable} to "{variable}"
+		replace every "<sender>" in {variable} with "%player%"
+		replace every "<receiver>" in {variable} with "%arg-1%"
+		replace every "<message>" in {variable} with "%arg-2%"
+		message "%{variable}%"
+		#set global {variable}
+function staffMsg(p: player, m: text):
+	loop all of the bungeecord players:
+		delete {variable}
+		set {variable} to loop-value parsed as a offline player
+		execute "select * from server_inheritance" in {variable} and store the result in {variable}
+		loop {variable}:
+			"%{variable}%" is "%uuid of {variable}%"
+			set {variable} to loop-index
+		set {variable} to "%{variable}%}%"
+		delete {variable}
+		delete {variable}
+		execute "select * from server_permissions" in {variable} and store the result in {variable}
+		loop {variable}:
+			"%{variable}%" is "%{variable}%"
+			"%{variable}%" is "rank-ladder"
+			"%{variable}%" is "Staff" or "Owner"
+			set {variable} to true
+		if {variable} is true:
+			message "{variable}&d%{variable}%&f: %{variable}%" to bungeecord player "%loop-value%"
+command /staffmsg [<text>]:
+	permission: admin
+	usage: /staffmsg <message>
+	trigger:
+		if arg-1 is not set:
+			message "{variable}Please specify a message!"
+			stop
+		staffMsg(player, arg-1)
+function swearDecrypt(p: player, m: text) :: boolean:
+	replace every {variable} in {variable} with ""
+	replace every "(_)" and "|_|" and "ú" and "ù" and "ü" in {variable} with "u"
+	replace every "|<" in {variable} with "k"
+	replace every "0" and "()" in {variable} with "o"
+	replace every "$" and "z" and "5" in {variable} with "s"
+	replace every "ë" and "è" and "é" and "3" in {variable} with "e"
+	replace every "ç" and "¢" in {variable} with "c"
+	replace every "ï" and "í" and "ì" and "1" and "¡" and "|" and "!" in {variable} with "i"
+	replace every "ą" and "ă" and "ä" and "à" and "á" and "ä" and "ã" and "@" in {variable} with "a"
+	replace every "ó" and "ò" and "õ" and "ö" and "()" in {variable} with "o"
+	replace every "7" in {variable} with "t"
+	replace every " " and "_" and "-" and "+" and "=" and "." and "," and "<" and ">" and "/" and "?" and ";" and ":" and "'" and """" and "\" and "|" and "]" and "[" and "{variable}" and "`" and "~" and "!" and "##" and "@" and "$" and "%%" and "^" and "&" and "*" and "(" and ")" in {variable} with ""
+	set {variable} to {variable}
+	replace every {variable} in {variable} with ""
+	if {variable} is {variable}:
+		return false
+	else:
+		return true
+	
+on chat:
+	if message is "nub":
+		set message to random element out of {variable}
+		stop
+	set {variable} to swearDecrypt(player, message)
+	if {variable} is false:
+		stop
+	if {variable} is true:
+		cancel event
+		send "{variable}&1%player% &4said &2&o%message% &r&4in chat." to console
+		loop all players:
+			loop-player has permission "admin"
+			send "{variable} &2%player% &4said &2&o%message% &r&4in chat." to loop-player
+command /alltp [<offline player>]:
+    permission: admin
+    usage: /alltp <player>
     trigger:
-        send test()
-        play sound "block.note_block.basedrum" to all players
-        debug!("hello", "sklectern.dev")
-        chance!(broadcast "hi", 0.5)
-
-item!(dirt, 5 seconds)
-item!(stone, 10 seconds)
-
-macro debug!(message, permission):
-    send $message to all players where [input has permission $permission]
-
-macro chance!(statement, chance):
-    if chance of $chance:
-        $statement
-
-structure macro item!(item, cooldown):
-    command /$item:
-        cooldown: $cooldown
-        cooldown message: &cWait a little longer before getting another item!
-        trigger:
-            give $item to player
+        if arg-1 is not set:
+            message "{variable}Usage: /alltp <player>"
+            stop
+        if all of the bungeecord players does not contain "%arg-1%":
+            message "{variable}That player isn't online!"
+            stop
+        set {variable} to "%arg-1%"
+        set {variable} to "%current bungeecord server of player {variable}%"
+        bungeecord connect player to "%{variable}%"
+        wait 3 ticks
+        make bungee player "%player%" run command "/tp %arg-1%"
+command /list:
+	trigger:
+		loop all bungeecord players:
+			set {variable} to uuid of "%loop-value%" parsed as a offline player
+			set {variable} to "%loop-value%"
+			if global {variable}%} is true:
+				set {variable} to false
+			else:
+				set {variable} to true
+			{variable} is true
+			set {variable} to "%current bungeecord server of player {variable}%"
+			add loop-value to {variable::*}
+		message "{variable}Players online:"
+		loop all bungeecord servers:
+			set {variable} to loop-value
+			replace every "lobby" in {variable} with "hub"
+			set {variable} to split {variable} at ""
+			set {variable} to split "ABCDEFGHIJKLMNOPQRSTUVWXYZ" at ""
+			set {variable} to split "abcdefghijklmnopqrstuvwxyz" at ""
+			loop {variable}:
+				"%{variable}%" is "%loop-value-2%"
+				set {variable} to {variable}
+			set {variable} to join {variable} with ""
+			if {variable} is not set:
+				message "&b%{variable}%: &dNo players!"
+			else:
+				message "&b%{variable}%: &d%{variable}%"
+command /vanish [<text>]:
+	aliases: /v
+	permission: admin
+	trigger:
+		if arg-1 is not set:
+			if {variable} is not set:
+				vanishEnable(player)
+				message "{variable}Vanish enabled!"
+				stop
+			if {variable} is false:
+				vanishEnable(player)
+				message "{variable}Vanish enabled!"
+				stop
+			if {variable} is true:
+				vanishDisable(player)
+				message "{variable}Vanish disabled!"
+				stop
+			stop
+function vanishEnable(p: player):
+	set {variable} to uuid of {variable}
+	set {variable}%} to true
+	set global {variable}%} to true
+	send actionbar "{variable}You are hidden from all players!" to bungee {variable}
+	hide {variable} from all players
+function vanishDisable(p: player):
+	set {variable} to uuid of {variable}
+	set {variable}%} to false
+	set global {variable}%} to false
+	reveal {variable} from all players
+every second:
+	loop all players:
+		{variable} is true
+		send actionbar "{variable}You are hidden from all players!" to bungee loop-player
+on join:
+	loop all players:
+		{variable} is true
+		hide loop-player from all players
+on join:
+	set {variable} to global {variable}
+	{variable} is true
+	vanishEnable(player)
+	set join message to ""
+on disconnect:
+	set global {variable} to {variable}
+	{variable} is true
+	set quit message to ""
+on step on a tripwire:
+	if {variable} is true:
+		cancel event
+on stepping on a pressure plate:
+	if {variable} is true:
+		cancel event
+on pick up:
+	if {variable} is true:
+		cancel event
+on damage:
+	if {variable} is true:
+		cancel event
+#on right click:
+#	{variable} is true
+#	clicked block is a chest or a trapped chest
+#	cancel event
+#	set {variable} to gui size of clicked block / 9
+#	set {variable} to gui size of clicked block 
+#	if {variable} is 3:
+#		set {variable} to "Chest"
+#	if {variable} is 6:
+#		set {variable} to "Large Chest"
+#	open chest with {variable} rows named "%{variable}%" to player
+#	set {variable} to 0
+#	loop {variable} times:
+#		format slot {variable} of player with slot {variable} of clicked block to be unstealable
+#		add 1 to {variable}
+on right click:
+	{variable} is true
+	clicked block is an ender chest
+	cancel event
+	open player's enderchest to player
