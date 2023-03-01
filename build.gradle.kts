@@ -27,20 +27,14 @@ subprojects {
         }
 
         build {
-            dependsOn(shadowJar)
-        }
-    }
-}
-
-tasks {
-    build {
-        subprojects.forEach {
             doLast {
                 copy {
-                    from(it.buildDir)
+                    from(buildDir)
                     into(rootProject.buildDir)
                 }
             }
+
+            dependsOn(shadowJar)
         }
     }
 }
