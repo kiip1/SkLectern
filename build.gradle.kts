@@ -34,8 +34,8 @@ subprojects {
 
 tasks {
     build {
-        doLast {
-            subprojects.forEach {
+        subprojects.forEach {
+            doLast {
                 copy {
                     from(it.buildDir)
                     into(rootProject.buildDir)
