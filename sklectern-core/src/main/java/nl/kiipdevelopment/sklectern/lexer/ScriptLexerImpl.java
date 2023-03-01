@@ -68,7 +68,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 
             if (next == ' ' && previous != TokenType.END) {
                 chars.poll();
-                return next(spacing.left());
+                return next(Spacing.LEFT);
             }
 
             if (previous == TokenType.END && (next == ' ' || next == '\t'))

@@ -14,9 +14,7 @@ public record Token(TokenType type, String value, Spacing spacing) {
     @ApiStatus.Internal
     public enum Spacing {
         NONE(Function.identity()),
-        LEFT(input -> " " + input),
-        RIGHT(input -> input + " "),
-        BOTH(input -> " " + input + " ");
+        LEFT(input -> " " + input);
 
         private final Function<String, String> applier;
 
@@ -26,20 +24,6 @@ public record Token(TokenType type, String value, Spacing spacing) {
 
         public String apply(String input) {
             return applier.apply(input);
-        }
-
-        public @NotNull Spacing left() {
-            return switch (this) {
-                case NONE, LEFT -> LEFT;
-                case RIGHT, BOTH -> BOTH;
-            };
-        }
-
-        public @NotNull Spacing right() {
-            return switch (this) {
-                case NONE, RIGHT -> RIGHT;
-                case LEFT, BOTH -> BOTH;
-            };
         }
     }
 }
