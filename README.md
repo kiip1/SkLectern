@@ -9,6 +9,7 @@ Please do note that this is just a proof of concept, and the result is by no mea
 
 ## Features
 - [Macros](#macros)
+- [Arithmetic](#arithmetic)
 
 ### Macros
 This language feature is similar to Skript options, it gets searched and replaced before execution like options, but allows arguments like functions.
@@ -62,6 +63,10 @@ command /stone:
     give stone to player
 ```
 
+### Arithmetic
+Simple arithmetic like `3 + 2` gets simplified into `5`.
+This allows you to write more clear code without worrying about performance.
+
 ## Goals
 - Add more language features to Skript for advanced users.
 - Optimize parse times without requiring manual optimization.
@@ -80,7 +85,7 @@ More syntax coverage is always welcome.
 - [x] Initial attempt with a proof of concept.
 - [ ] Add implementations for CLI and Bukkit.
 - [ ] Create API to allow for easier hooking.
-- [ ] Performance: Literal Arithmetic
+- [x] Performance: Literal Arithmetic
 - [ ] Language Feature: Annotations
 - [ ] Performance: Pure Functions
 - [ ] Language Feature: Auto-Cleaning Variables
