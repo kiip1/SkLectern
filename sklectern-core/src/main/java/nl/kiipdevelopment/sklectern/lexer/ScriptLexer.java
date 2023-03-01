@@ -6,6 +6,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
+/**
+ * The lexer tokenizes a script, with every line beginning with an indent token and ending with an end token.
+ * When the lexer sees a character which has a {@link TokenType} representing it, it will return the current identifier
+ * to then proceed with lexing the next special character.
+ *
+ * @see Token
+ */
 @ApiStatus.Experimental
 public interface ScriptLexer {
 	static @NotNull ScriptLexer of(String script) {

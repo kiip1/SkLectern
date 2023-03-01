@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 final class PowerNIterator {
-
 	private final BigDecimal x;
 
 	private final MathContext mathContext;

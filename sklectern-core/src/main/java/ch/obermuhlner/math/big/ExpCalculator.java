@@ -8,7 +8,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 final class ExpCalculator {
-
 	public static final ExpCalculator INSTANCE = new ExpCalculator();
 	private final List<BigRational> factors = new ArrayList<>();
 
@@ -75,5 +74,4 @@ final class ExpCalculator {
 	private void addFactor(BigRational factor){
 		factors.add(requireNonNull(factor, "Factor cannot be null"));
 	}
-
 }

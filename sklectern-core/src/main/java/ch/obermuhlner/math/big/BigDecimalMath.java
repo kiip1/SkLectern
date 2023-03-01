@@ -8,9 +8,12 @@ import java.math.RoundingMode;
 
 import static java.math.BigDecimal.*;
 
+/**
+ * @see <a href="https://github.com/eobermuhlner/big-math">Source</a>
+ * @author Eric Obermühlner
+ */
 @ApiStatus.Internal
 public final class BigDecimalMath {
-
 	private static final BigDecimal TWO = valueOf(2);
 	private static final BigDecimal THREE = valueOf(3);
 

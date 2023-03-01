@@ -8,6 +8,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * A token type can either represent a character (like operators), a value (like strings and numbers) or
+ * act as a marking, like indent and end.
+ */
 @ApiStatus.Internal
 public enum TokenType {
     NUMBER,

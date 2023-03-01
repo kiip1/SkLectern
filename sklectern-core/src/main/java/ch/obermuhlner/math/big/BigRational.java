@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 final class BigRational extends Number implements Comparable<BigRational>, Serializable {
-
 	public static final BigRational ZERO = new BigRational(0);
 
 	public static final BigRational ONE = new BigRational(1);

@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * A parse exception gets thrown when there is an error during the parsing of a script.
+ */
 @ApiStatus.Internal
 public final class ParseException extends IllegalArgumentException {
-	
 	public ParseException(ScriptLexer.@NotNull Instance lexer, @NotNull String script, TokenType received) {
 		this(lexer.position(), script, "Unexpected " + received);
 	}
@@ -32,6 +34,7 @@ public final class ParseException extends IllegalArgumentException {
 	}
 	
 	public ParseException(int position, @NotNull String script, @Nullable String message) {
+		// The line number doesn't work all the time
 		this((script.substring(0, position - 1) +
                 ">>>" + script.charAt(position - 1) + "<<<" +
                 script.substring(position) +
@@ -44,5 +47,4 @@ public final class ParseException extends IllegalArgumentException {
 			return parts[parts.length - 1];
 		}).apply(message), null);
 	}
-
 }

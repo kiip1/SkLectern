@@ -1,9 +1,18 @@
 package nl.kiipdevelopment.sklectern;
 
 import nl.kiipdevelopment.sklectern.context.Config;
+import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
+import nl.kiipdevelopment.sklectern.parser.ScriptParser;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Entry point to certain SkLectern features.
+ *
+ * @see ScriptLexer
+ * @see ScriptParser
+ * @see Script
+ */
 @ApiStatus.Experimental
 public interface SkLectern {
     static SkLectern instance() {

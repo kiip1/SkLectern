@@ -9,6 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Like a {@link Macro} but for structures.
+ *
+ * @param name The macro name, without !
+ * @param parameters Parameters this macro will accept
+ * @param structure The content of this macro
+ */
 @ApiStatus.Internal
 public record StructureMacro(String name, List<String> parameters, ASTStructure structure) {
     public StructureMacro {

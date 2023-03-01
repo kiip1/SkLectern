@@ -13,6 +13,12 @@ import java.nio.file.Path;
 
 import static com.google.common.io.Files.getNameWithoutExtension;
 
+/**
+ * A utility class to improve Script-handling accessibility.
+ *
+ * @param name The name of the script
+ * @param source Content of the script
+ */
 @ApiStatus.Experimental
 public record Script(String name, String source) {
     public Script(@NotNull Path path) throws IOException {
@@ -32,5 +38,4 @@ public record Script(String name, String source) {
         node.check(context);
         return node.visit(context);
     }
-
 }

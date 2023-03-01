@@ -10,6 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+/**
+ * The script manager allows for quick transformation of all scripts.
+ */
 @ApiStatus.Experimental
 public final class ScriptManager {
     private final Config config;

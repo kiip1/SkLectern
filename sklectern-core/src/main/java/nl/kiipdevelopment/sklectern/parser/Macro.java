@@ -9,6 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A macro is like a function but at compile time.
+ * It acts as a search and replace like options do but with arguments.
+ *
+ * @param name The macro name, without !
+ * @param parameters Parameters this macro will accept
+ * @param statements The content of this macro
+ */
 @ApiStatus.Internal
 public record Macro(String name, List<String> parameters, ASTStatementList statements) {
     public Macro {
