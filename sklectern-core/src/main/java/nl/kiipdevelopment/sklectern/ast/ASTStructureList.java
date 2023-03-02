@@ -20,7 +20,7 @@ public record ASTStructureList(List<ASTStructure> structures) implements ASTNode
 
     @Override
     public @NotNull String visit(@NotNull Context context) {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (ASTStructure structure : structures)
             builder.append(structure.visit(context)).append("\n");
         return builder.toString().replaceAll("(?m)^[ \\t]*\\r?\\n", "");
