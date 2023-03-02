@@ -23,7 +23,13 @@ public interface SkLectern {
         SkLecternImpl.instance = instance;
     }
 
+    /**
+     * @see Config
+     */
     @NotNull Config config();
 
+    /**
+     * @see ScriptManager
+     */
     @NotNull ScriptManager scriptManager();
 }
