@@ -8,9 +8,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @ApiStatus.Internal
-public record ASTMacro(String name, List<String> arguments, ASTStatementList statements) implements ASTStructure {
+public record ASTMacro(String name, List<String> arguments, ASTStatement statements) implements ASTStructure {
     public ASTMacro {
         arguments = List.copyOf(arguments);
+    }
+
+    @Override
+    public @NotNull ASTNode shake() {
+        final ASTNode statements = this.statements.shake();
+
+        if (statements instanceof ASTEmpty) return new ASTEmpty();
+        else if (!(statements instanceof ASTStatement statement)) return new ASTEmpty();
+        else return new ASTMacro(name, arguments, statement);
     }
 
     @Override

@@ -13,6 +13,21 @@ public record ASTStructureList(List<ASTStructure> structures) implements ASTNode
     }
 
     @Override
+    public @NotNull ASTNode shake() {
+        final List<ASTStructure> structures = this.structures
+                .stream()
+                .map(ASTNode::shake)
+                .filter(node -> !(node instanceof ASTEmpty))
+                .filter(node -> node instanceof ASTStructure)
+                .map(node -> (ASTStructure) node)
+                .toList();
+
+        if (structures.size() == 0) return new ASTEmpty();
+        else if (structures.size() == 1) return structures.get(0);
+        else return new ASTStructureList(structures);
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         for (ASTStructure structure : structures)
             structure.check(context);

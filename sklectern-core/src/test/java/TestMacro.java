@@ -2,7 +2,7 @@ import nl.kiipdevelopment.sklectern.Script;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-final class TestTransform {
+final class TestMacro {
     @Test
     public void testMacro() {
         final Script script = new Script("macro", """

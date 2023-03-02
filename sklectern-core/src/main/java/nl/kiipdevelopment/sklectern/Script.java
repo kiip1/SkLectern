@@ -29,7 +29,9 @@ public record Script(String name, String source) {
         ScriptLexer lexer = ScriptLexer.of(source);
         ScriptParser parser = ScriptParser.of(lexer);
 
-        return parser.instance().parse();
+        return parser.instance()
+                .parse()
+                .shake();
     }
 
     public String transform() {

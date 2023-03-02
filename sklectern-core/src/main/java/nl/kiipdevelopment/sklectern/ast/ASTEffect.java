@@ -9,6 +9,11 @@ import java.util.List;
 @ApiStatus.Internal
 public record ASTEffect(ASTNode node) implements ASTStatement {
     @Override
+    public @NotNull ASTNode shake() {
+        return new ASTEffect(node.shake());
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         node.check(context);
     }

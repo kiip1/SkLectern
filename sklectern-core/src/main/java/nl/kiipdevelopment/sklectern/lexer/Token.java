@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 /**
- * A token represents a token type (string, number, quote) with the string value.
+ * A token represents a token type (string, number, quote) with the string node.
  * An example:
  * <pre>
  *     send 1 + 2
@@ -24,7 +24,7 @@ import java.util.function.Function;
  * Hence, we leave this up to the end-user.
  *
  * @param type The token type
- * @param value The value
+ * @param value The node
  * @param spacing The spacing
  */
 @ApiStatus.Internal

@@ -14,6 +14,21 @@ public record ASTStatementList(List<ASTStatement> statements) implements ASTStat
     }
 
     @Override
+    public @NotNull ASTNode shake() {
+        final List<ASTStatement> statements = this.statements
+                .stream()
+                .map(ASTNode::shake)
+                .filter(node -> !(node instanceof ASTEmpty))
+                .filter(node -> node instanceof ASTStatement)
+                .map(node -> (ASTStatement) node)
+                .toList();
+
+        if (statements.size() == 0) return new ASTEmpty();
+        else if (statements.size() == 1) return statements.get(0);
+        else return new ASTStatementList(statements);
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         for (ASTStatement statement : statements)
             statement.check(context);

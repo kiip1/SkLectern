@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * A token type can either represent a character (like operators), a value (like strings and numbers) or
+ * A token type can either represent a character (like operators), a node (like strings and numbers) or
  * act as a marking, like indent and end.
  */
 @ApiStatus.Internal

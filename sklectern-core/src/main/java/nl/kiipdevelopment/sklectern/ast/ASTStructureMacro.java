@@ -14,6 +14,11 @@ public record ASTStructureMacro(String name, List<String> arguments, ASTStructur
     }
 
     @Override
+    public @NotNull ASTNode shake() {
+        return new ASTStructureMacro(name, arguments, (ASTStructure) structure.shake());
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         structure.check(context);
         context.structureMacros(macros -> macros.add(new StructureMacro(name, arguments, structure)));

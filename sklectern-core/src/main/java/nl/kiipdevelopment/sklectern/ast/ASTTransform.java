@@ -15,6 +15,14 @@ public record ASTTransform(ASTStatement statement, Map<String, String> replacer)
     }
 
     @Override
+    public @NotNull ASTNode shake() {
+        final ASTNode node = this.statement.shake();
+        if (node instanceof ASTEmpty) return new ASTEmpty();
+        else if (!(node instanceof ASTStatement astStatement)) return new ASTEmpty();
+        else return new ASTTransform(astStatement, replacer);
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         statement.check(context);
     }

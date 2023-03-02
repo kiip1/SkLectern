@@ -13,6 +13,19 @@ public record ASTNodeList(List<ASTNode> nodes) implements ASTNode {
     }
 
     @Override
+    public @NotNull ASTNode shake() {
+        final List<ASTNode> nodes = this.nodes
+                .stream()
+                .map(ASTNode::shake)
+                .filter(node -> !(node instanceof ASTEmpty))
+                .toList();
+
+        if (nodes.size() == 0) return new ASTEmpty();
+        else if (nodes.size() == 1) return nodes.get(0);
+        else return new ASTNodeList(nodes);
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         for (ASTNode node : nodes)
             node.check(context);

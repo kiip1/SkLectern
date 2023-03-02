@@ -9,20 +9,29 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @ApiStatus.Internal
-public record ASTStructureMacroReference(String name, List<ASTNode> arguments) implements ASTStructure {
+public record ASTStructureMacroReference(String name, ASTNodeList arguments) implements ASTStructure {
+    @Override
+    public @NotNull ASTNode shake() {
+        final ASTNode node = this.arguments.shake();
+        if (node instanceof ASTEmpty) return new ASTEmpty();
+        else if (!(node instanceof ASTNodeList args)) return new ASTStructureMacroReference(name,
+                new ASTNodeList(List.of(node)));
+        else return new ASTStructureMacroReference(name, args);
+    }
+
     @Override
     public void check(@NotNull Context context) {
-        for (ASTNode argument : arguments)
+        for (ASTNode argument : arguments.nodes())
             argument.check(context);
         for (StructureMacro macro : context.structureMacros())
-            if (macro.name().equals(name) && macro.parameters().size() != arguments.size())
+            if (macro.name().equals(name) && macro.parameters().size() != arguments.nodes().size())
                 throw new ParseException("Macro " + name + " expected " + macro.parameters().size() + " arguments, " +
-                        "but received " + arguments.size());
+                        "but received " + arguments.nodes().size());
     }
 
     @Override
     public @NotNull String visit(@NotNull Context context) {
-        List<String> arguments = this.arguments.stream()
+        List<String> arguments = this.arguments.nodes().stream()
                 .map(node -> node.visit(context).trim())
                 .toList();
 

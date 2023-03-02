@@ -12,6 +12,11 @@ import java.math.RoundingMode;
 @ApiStatus.Internal
 public record ASTBinaryOperator(ASTNode left, ASTNode right, BinaryOperator operator) implements ASTNode {
     @Override
+    public @NotNull ASTNode shake() {
+        return new ASTBinaryOperator(left.shake(), right.shake(), operator);
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         left.check(context);
         right.check(context);

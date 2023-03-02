@@ -8,7 +8,18 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
-public record ASTSection(ASTNode name, ASTStatementList statements) implements ASTStatement {
+public record ASTSection(ASTNode name, ASTStatement statements) implements ASTStatement {
+    @Override
+    public @NotNull ASTNode shake() {
+        final ASTNode name = this.name.shake();
+        final ASTNode statements = this.statements.shake();
+
+        if (statements instanceof ASTEmpty) return new ASTEmpty();
+        else if (!(statements instanceof ASTStatement statement)) return new ASTEmpty();
+        else if (name instanceof ASTEmpty) return statements;
+        else return new ASTSection(name, statement);
+    }
+
     @Override
     public void check(@NotNull Context context) {
         statements.check(context);

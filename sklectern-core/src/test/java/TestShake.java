@@ -1,0 +1,14 @@
+import nl.kiipdevelopment.sklectern.Script;
+import org.junit.jupiter.api.Test;
+
+final class TestShake {
+    @Test
+    public void testShake() {
+        final Script script = new Script("shake", """
+        on join:
+            send "hi"
+        """);
+
+        System.out.println(script.parse());
+    }
+}

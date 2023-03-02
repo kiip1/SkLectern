@@ -74,7 +74,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     arguments.add(element(List.of(TokenType.COMMA, TokenType.PARENTHESIS_CLOSE)));
                 eat(TokenType.END);
 
-                return new ASTStructureMacroReference(name, arguments);
+                return new ASTStructureMacroReference(name, new ASTNodeList(arguments));
             }
 
             final StringBuilder name = new StringBuilder();
@@ -94,7 +94,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
                 return new ASTStruct(name.toString(), entries);
             } else { // Trigger
-                return new ASTStruct(name.toString(), List.of(new ASTStructureEntry<>(null, statementList())));
+                return new ASTStruct(name.toString(), List.of(new ASTStructureEntry(null, statementList())));
             }
         }
 
@@ -122,12 +122,12 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             else return new ASTMacro(name, arguments, statementList());
         }
 
-        private @NotNull ASTStructureEntry<?> entry() {
+        private @NotNull ASTStructureEntry entry() {
             final ASTNode key = element(List.of(TokenType.COLON));
             final boolean statementList = ifEat(TokenType.END);
 
-            if (statementList) return new ASTStructureEntry<>(key, statementList());
-            else return new ASTStructureEntry<>(key, element(List.of(TokenType.END)));
+            if (statementList) return new ASTStructureEntry(key, statementList());
+            else return new ASTStructureEntry(key, element(List.of(TokenType.END)));
         }
 
         private @NotNull ASTStatementList statementList() {
@@ -150,7 +150,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     arguments.add(element(List.of(TokenType.COMMA, TokenType.PARENTHESIS_CLOSE)));
                 eat(TokenType.END);
 
-                return new ASTMacroReference(name, arguments);
+                return new ASTMacroReference(name, new ASTNodeList(arguments));
             }
 
             final ASTNode node = element(List.of(TokenType.END, TokenType.COLON));

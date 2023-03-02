@@ -10,6 +10,11 @@ import java.math.BigDecimal;
 @ApiStatus.Internal
 public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements ASTNode {
     @Override
+    public @NotNull ASTNode shake() {
+        return new ASTUnaryOperator(node.shake(), operator);
+    }
+
+    @Override
     public void check(@NotNull Context context) {
         node.check(context);
     }

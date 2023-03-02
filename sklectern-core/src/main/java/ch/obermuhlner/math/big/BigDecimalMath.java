@@ -125,7 +125,7 @@ public final class BigDecimalMath {
 
 	private static BigDecimal powInteger(BigDecimal x, BigDecimal integerY, MathContext mathContext) {
 		if (fractionalPart(integerY).signum() != 0) {
-			throw new IllegalArgumentException("Not integer value: " + integerY);
+			throw new IllegalArgumentException("Not integer node: " + integerY);
 		}
 
 		if (integerY.signum() < 0) {
