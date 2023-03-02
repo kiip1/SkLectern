@@ -123,12 +123,11 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         }
 
         private @NotNull ASTStructureEntry<?> entry() {
-            final String key = element(List.of(TokenType.COLON)).visit(null);
-            final ASTNode node = element(List.of(TokenType.END));
+            final ASTNode key = element(List.of(TokenType.COLON));
+            final boolean statementList = ifEat(TokenType.END);
 
-            if (key.equals("trigger"))
-                return new ASTStructureEntry<>(key, statementList());
-            return new ASTStructureEntry<>(key, node);
+            if (statementList) return new ASTStructureEntry<>(key, statementList());
+            else return new ASTStructureEntry<>(key, element(List.of(TokenType.END)));
         }
 
         private @NotNull ASTStatementList statementList() {
