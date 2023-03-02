@@ -22,7 +22,7 @@ final class Test {
         final Script script = new Script(SkLectern.instance()
                 .config()
                 .scriptFolder()
-                .resolve("test.lsk"));
+                .resolve("capture.lsk"));
 
         ScriptLexer.of(script.source())
                 .instance()
