@@ -6,56 +6,60 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.util.function.Function;
 
 @ApiStatus.Internal
 public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements ASTNode {
     @Override
-    public void check(Context context) {
+    public void check(@NotNull Context context) {
         node.check(context);
     }
 
     @Override
     public @NotNull String visit(@NotNull Context context) {
-        return apply().visit(context);
+        return apply(context).visit(context);
     }
 
-    public ASTNode apply() {
-        return operator.apply(node);
+    public ASTNode apply(Context context) {
+        return operator.apply(context, node);
     }
 
     public enum UnaryOperator {
-        ADDITION(node -> {
-            if (node instanceof ASTNumber number)
+        ADDITION((context, input) -> {
+            if (input instanceof ASTNumber number)
                 return new ASTNumber(number.value());
-            if (node instanceof ASTLiteral<?> literal)
+            if (input instanceof ASTLiteral<?> literal)
                 return new ASTString("+" + literal.visit());
 
-            throw new ParseException("Attempted addition on " + node);
+            throw new ParseException("Attempted addition on " + input);
         }),
-        SUBTRACTION(node -> {
-            if (node instanceof ASTNumber number)
+        SUBTRACTION((context, input) -> {
+            if (input instanceof ASTNumber number)
                 return new ASTNumber(number.value().multiply(BigDecimal.valueOf(-1)));
-            if (node instanceof ASTLiteral<?> literal)
+            if (input instanceof ASTLiteral<?> literal)
                 return new ASTString("-" + literal.visit());
 
-            throw new ParseException("Attempted addition on " + node);
+            throw new ParseException("Attempted addition on " + input);
         });
 
-        private final Function<ASTNode, ASTNode> applier;
+        private final ContextUnaryOperator<ASTNode> unaryOperator;
 
-        UnaryOperator(Function<ASTNode, ASTNode> applier) {
-            this.applier = applier;
+        UnaryOperator(ContextUnaryOperator<ASTNode> unaryOperator) {
+            this.unaryOperator = unaryOperator;
         }
 
-        public ASTNode apply(ASTNode node) {
-            if (node instanceof ASTBinaryOperator operator)
-                return apply(operator.apply());
+        public ASTNode apply(Context context, ASTNode input) {
+            if (input instanceof ASTBinaryOperator operator)
+                return apply(context, operator.apply(context));
 
-            if (node instanceof ASTUnaryOperator operator)
-                return apply(operator.apply());
+            if (input instanceof ASTUnaryOperator operator)
+                return apply(context, operator.apply(context));
 
-            return applier.apply(node);
+            return unaryOperator.apply(context, input);
+        }
+
+        @FunctionalInterface
+        private interface ContextUnaryOperator<T> {
+            @NotNull T apply(@NotNull Context context, @NotNull T input);
         }
     }
 }
