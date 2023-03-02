@@ -29,21 +29,13 @@ public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements 
     }
 
     public enum UnaryOperator {
-        ADDITION((context, input) -> {
-            if (input instanceof ASTNumber number)
-                return new ASTNumber(number.value());
-            if (input instanceof ASTLiteral<?> literal)
-                return new ASTString("+" + literal.visit());
-
-            throw new ParseException("Attempted addition on " + input);
-        }),
         SUBTRACTION((context, input) -> {
             if (input instanceof ASTNumber number)
                 return new ASTNumber(number.value().multiply(BigDecimal.valueOf(-1)));
             if (input instanceof ASTLiteral<?> literal)
                 return new ASTString("-" + literal.visit());
 
-            throw new ParseException("Attempted addition on " + input);
+            throw new ParseException("Attempted subtraction on " + input);
         });
 
         private final ContextUnaryOperator<ASTNode> unaryOperator;

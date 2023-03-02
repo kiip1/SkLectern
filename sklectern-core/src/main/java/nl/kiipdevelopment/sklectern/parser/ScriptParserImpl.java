@@ -162,10 +162,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         }
 
         private ASTNode factor() {
-            if (current.type() == TokenType.PLUS) {
-                eat(TokenType.PLUS);
-                return new ASTUnaryOperator(factor(), UnaryOperator.ADDITION);
-            } else if (current.type() == TokenType.MINUS) {
+            if (current.type() == TokenType.MINUS) {
                 eat(TokenType.MINUS);
                 return new ASTUnaryOperator(factor(), UnaryOperator.SUBTRACTION);
             }
@@ -229,10 +226,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private @NotNull ASTNode element(@NotNull List<TokenType> closers) {
             final List<ASTNode> nodes = new ArrayList<>();
             while (!closers.contains(current.type())) {
-                if (current.type() == TokenType.NUMBER ||
-                        current.type() == TokenType.PLUS ||
-                        current.type() == TokenType.MINUS) {
-
+                if (current.type() == TokenType.NUMBER || current.type() == TokenType.PLUS || current.type() == TokenType.MINUS) {
                     if (current.spacing() == Spacing.LEFT)
                         nodes.add(new ASTString(" "));
                     nodes.add(sum());
