@@ -55,7 +55,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		private @NotNull Token next(Spacing spacing) {
 			this.spacing = spacing;
 			peek = null;
-			Character next = chars.peek();
+            final Character next = chars.peek();
 			if (next == null) {
 				previous = TokenType.END;
 				return new Token(TokenType.END, "", spacing);
@@ -89,7 +89,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
                 return variable();
             }
 
-			TokenType tokenType = TokenType.typeOfCharacter(next);
+            final TokenType tokenType = TokenType.typeOfCharacter(next);
 			if (tokenType != null) {
 				chars.poll();
 				previous = tokenType;
@@ -105,9 +105,9 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 			if (peek != null)
 				return peek;
 
-			TokenType previous = this.previous;
-			Deque<Character> chars = new ArrayDeque<>(this.chars);
-			Token peek = next();
+            final TokenType previous = this.previous;
+            final Deque<Character> chars = new ArrayDeque<>(this.chars);
+            final Token peek = next();
 			this.chars.clear();
 			this.chars.addAll(chars);
 			this.peek = peek;
@@ -118,9 +118,9 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 
         @Override
         public @NotNull Token peekBefore(TokenType type) {
-            TokenType previous = this.previous;
-            Token peek = this.peek;
-            Deque<Character> chars = new ArrayDeque<>(this.chars);
+            final TokenType previous = this.previous;
+            final Token peek = this.peek;
+            final Deque<Character> chars = new ArrayDeque<>(this.chars);
             Token current = next();
             Token result = null;
             while (current.type() != type) {
@@ -146,7 +146,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		}
 
 		private @NotNull Token indent() {
-			StringBuilder result = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
 			while (!chars.isEmpty() && (chars.peek() == ' ' || chars.peek() == '\t'))
 				result.append(chars.poll());
 
@@ -154,7 +154,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		}
 
 		private @NotNull Token number() {
-			StringBuilder result = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
             boolean decimal = false;
             if (Objects.equals(chars.peek(), '-'))
                 result.append(chars.poll());
@@ -172,7 +172,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		}
 
 		private @NotNull Token identifier() {
-			StringBuilder result = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
 			do result.append(chars.poll());
 			while (!chars.isEmpty() && chars.peek() != '\n' && chars.peek() != ' ' && !Character.isDigit(chars.peek()) && TokenType.noAssociatedValue(chars.peek()));
 
@@ -180,7 +180,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		}
 
 		private @NotNull Token string() {
-			StringBuilder result = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
 			chars.poll();
 			while (!chars.isEmpty() && chars.peek() != TokenType.QUOTE.value)
 				result.append(chars.poll());
@@ -189,14 +189,17 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 			return new Token(TokenType.STRING, "\"" + result + "\"", spacing);
 		}
 
+        // TODO Should probably be handled by the parser
         private @NotNull Token variable() {
-            StringBuilder result = new StringBuilder();
-            chars.poll();
-            while (!chars.isEmpty() && chars.peek() != TokenType.CURLY_CLOSE.value)
+            final StringBuilder result = new StringBuilder();
+            int depth = 0;
+            do {
+                if (chars.peek() == TokenType.CURLY_OPEN.value) depth++;
+                else if (chars.peek() == TokenType.CURLY_CLOSE.value) depth--;
                 result.append(chars.poll());
-            chars.poll();
+            } while (!chars.isEmpty() && depth > 0);
 
-            return new Token(TokenType.VARIABLE, "{" + result + "}", spacing);
+            return new Token(TokenType.VARIABLE, result.toString(), spacing);
         }
 	}
 }
