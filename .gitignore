@@ -17,4 +17,5 @@ gradle-app.setting
 .gradletasknamecache
 .idea/
 **/out/
+test-output.txt
 # gradle/wrapper/gradle-wrapper.properties
