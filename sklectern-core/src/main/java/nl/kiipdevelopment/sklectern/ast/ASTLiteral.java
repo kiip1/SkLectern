@@ -1,16 +1,17 @@
 package nl.kiipdevelopment.sklectern.ast;
 
 import nl.kiipdevelopment.sklectern.context.Context;
+import org.jetbrains.annotations.NotNull;
 
 public interface ASTLiteral<T> extends ASTNode {
-    T value();
+    @NotNull T value();
 
-    default String visit() {
+    default @NotNull String visit() {
         return value().toString();
     }
 
     @Override
-    default String visit(Context context) {
+    default @NotNull String visit(@NotNull Context context) {
         return visit();
     }
 }

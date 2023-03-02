@@ -1,13 +1,14 @@
 package nl.kiipdevelopment.sklectern.ast;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @ApiStatus.Experimental
 @ApiStatus.NonExtendable
 public interface ASTStructure extends ASTNode {
-    String name();
+    @NotNull String name();
 
-    List<ASTStatement> entries();
+    @NotNull List<ASTStatement> entries();
 }

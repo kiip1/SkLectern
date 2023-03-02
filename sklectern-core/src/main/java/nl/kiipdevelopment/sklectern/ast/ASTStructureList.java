@@ -13,7 +13,7 @@ public record ASTStructureList(List<ASTStructure> structures) implements ASTNode
     }
 
     @Override
-    public void check(Context context) {
+    public void check(@NotNull Context context) {
         for (ASTStructure structure : structures)
             structure.check(context);
     }

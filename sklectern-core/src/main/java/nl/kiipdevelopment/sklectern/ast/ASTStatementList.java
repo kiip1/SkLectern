@@ -2,6 +2,7 @@ package nl.kiipdevelopment.sklectern.ast;
 
 import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +14,13 @@ public record ASTStatementList(List<ASTStatement> statements) implements ASTStat
     }
 
     @Override
-    public void check(Context context) {
+    public void check(@NotNull Context context) {
         for (ASTStatement statement : statements)
             statement.check(context);
     }
 
     @Override
-    public List<String> get(Context context) {
+    public @NotNull List<String> get(@NotNull Context context) {
         List<String> results = new ArrayList<>();
         for (ASTStatement statement : statements)
             results.addAll(statement.get(context));

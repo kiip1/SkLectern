@@ -17,12 +17,12 @@ import static nl.kiipdevelopment.sklectern.ast.ASTUnaryOperator.*;
 
 record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
     @Override
-    public ScriptParser.@NotNull Instance instance() {
+    public @NotNull Instance instance() {
         return new InstanceImpl(this, lexer.instance());
     }
 
     @Override
-    public String script() {
+    public @NotNull String script() {
         return lexer.script();
     }
 

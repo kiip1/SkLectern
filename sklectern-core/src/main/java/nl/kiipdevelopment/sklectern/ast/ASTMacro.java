@@ -20,12 +20,12 @@ public record ASTMacro(String name, List<String> arguments, ASTStatementList sta
     }
 
     @Override
-    public @NotNull String visit(Context context) {
+    public @NotNull String visit(@NotNull Context context) {
         return "";
     }
 
     @Override
-    public List<ASTStatement> entries() {
+    public @NotNull List<ASTStatement> entries() {
         return List.of();
     }
 }

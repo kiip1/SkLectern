@@ -19,7 +19,7 @@ public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements 
         return apply(context).visit(context);
     }
 
-    public ASTNode apply(Context context) {
+    public @NotNull ASTNode apply(@NotNull Context context) {
         return operator.apply(context, node);
     }
 
@@ -47,7 +47,7 @@ public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements 
             this.unaryOperator = unaryOperator;
         }
 
-        public ASTNode apply(Context context, ASTNode input) {
+        public @NotNull ASTNode apply(@NotNull Context context, @NotNull ASTNode input) {
             if (input instanceof ASTBinaryOperator operator)
                 return apply(context, operator.apply(context));
 

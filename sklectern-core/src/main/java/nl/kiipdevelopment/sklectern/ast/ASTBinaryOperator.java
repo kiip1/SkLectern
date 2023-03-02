@@ -22,7 +22,7 @@ public record ASTBinaryOperator(ASTNode left, ASTNode right, BinaryOperator oper
         return apply(context).visit(context);
     }
 
-    public ASTNode apply(Context context) {
+    public ASTNode apply(@NotNull Context context) {
         return operator.apply(context, left, right);
     }
 
@@ -76,7 +76,7 @@ public record ASTBinaryOperator(ASTNode left, ASTNode right, BinaryOperator oper
             this.binaryOperator = binaryOperator;
         }
 
-        public ASTNode apply(Context context, ASTNode left, ASTNode right) {
+        public @NotNull ASTNode apply(@NotNull Context context, @NotNull ASTNode left, @NotNull ASTNode right) {
             if (left instanceof ASTBinaryOperator operator)
                 return apply(context, operator.apply(context), right);
 

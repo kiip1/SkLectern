@@ -14,18 +14,18 @@ import org.jetbrains.annotations.NotNull;
  */
 @ApiStatus.Experimental
 public interface ScriptParser {
-    static @NotNull ScriptParser of(ScriptLexer lexer) {
+    static @NotNull ScriptParser of(@NotNull ScriptLexer lexer) {
         return new ScriptParserImpl(lexer);
     }
 
     @Contract("-> new")
-    Instance instance();
+    @NotNull Instance instance();
 
-    String script();
+    @NotNull String script();
 
     int indentation();
 
     interface Instance {
-        ASTNode parse();
+        @NotNull ASTNode parse();
     }
 }

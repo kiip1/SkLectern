@@ -21,7 +21,7 @@ public record ASTMacroReference(String name, List<ASTNode> arguments) implements
     }
 
     @Override
-    public List<String> get(Context context) {
+    public @NotNull List<String> get(@NotNull Context context) {
         List<String> arguments = this.arguments.stream()
                 .map(node -> node.visit(context).trim())
                 .toList();

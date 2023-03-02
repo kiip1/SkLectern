@@ -15,11 +15,11 @@ import org.jetbrains.annotations.NotNull;
  */
 @ApiStatus.Experimental
 public interface SkLectern {
-    static SkLectern instance() {
+    static @NotNull SkLectern instance() {
         return SkLecternImpl.instance();
     }
 
-    static void setInstance(SkLectern instance) {
+    static void setInstance(@NotNull SkLectern instance) {
         SkLecternImpl.instance = instance;
     }
 

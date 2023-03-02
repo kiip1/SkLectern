@@ -21,7 +21,7 @@ public record ASTStructureMacroReference(String name, List<ASTNode> arguments) i
     }
 
     @Override
-    public String visit(Context context) {
+    public @NotNull String visit(@NotNull Context context) {
         List<String> arguments = this.arguments.stream()
                 .map(node -> node.visit(context).trim())
                 .toList();
@@ -34,7 +34,7 @@ public record ASTStructureMacroReference(String name, List<ASTNode> arguments) i
     }
 
     @Override
-    public List<ASTStatement> entries() {
+    public @NotNull List<ASTStatement> entries() {
         return List.of();
     }
 }

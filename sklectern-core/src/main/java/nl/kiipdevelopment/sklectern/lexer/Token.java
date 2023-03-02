@@ -1,6 +1,7 @@
 package nl.kiipdevelopment.sklectern.lexer;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -27,8 +28,8 @@ import java.util.function.Function;
  * @param spacing The spacing
  */
 @ApiStatus.Internal
-public record Token(TokenType type, String value, Spacing spacing) {
-    public String spaced() {
+public record Token(@NotNull TokenType type, @NotNull String value, @NotNull Spacing spacing) {
+    public @NotNull String spaced() {
         return spacing.apply(value);
     }
 

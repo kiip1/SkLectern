@@ -15,25 +15,25 @@ import java.util.Iterator;
  */
 @ApiStatus.Experimental
 public interface ScriptLexer {
-	static @NotNull ScriptLexer of(String script) {
+	static @NotNull ScriptLexer of(@NotNull String script) {
 		return new ScriptLexerImpl(script);
 	}
 	
 	@Contract("-> new")
-	Instance instance();
-	
-	String script();
+	@NotNull Instance instance();
+
+    @NotNull String script();
 
 	int indentation();
 
 	interface Instance extends Iterable<Token> {
-		Token next();
+        @NotNull Token next();
 
-		Token peek();
+        @NotNull Token peek();
 
-        Token peekBefore(TokenType type);
+        @NotNull Token peekBefore(TokenType type);
 
-		boolean hasNext();
+        boolean hasNext();
 
 		int position();
 
@@ -46,7 +46,7 @@ public interface ScriptLexer {
 				}
 
 				@Override
-				public Token next() {
+				public @NotNull Token next() {
 					return Instance.this.next();
 				}
 			};

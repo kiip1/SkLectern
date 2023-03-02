@@ -15,7 +15,7 @@ public record ASTStruct(String name, List<ASTStatement> entries) implements ASTS
     }
 
     @Override
-    public void check(Context context) {
+    public void check(@NotNull Context context) {
         for (ASTStatement entry : entries)
             entry.check(context);
     }
