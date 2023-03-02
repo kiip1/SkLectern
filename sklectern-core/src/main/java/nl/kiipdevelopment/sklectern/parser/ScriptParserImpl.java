@@ -245,8 +245,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             if (ifEat(closers.toArray(TokenType[]::new)) == null)
                 throw new ParseException(lexer, parser.script(), closers, current.type());
 
-            return nodes.stream().reduce((left, right) -> new ASTBinaryOperator(left, right, BinaryOperator.CONCATENATE))
-                    .orElse(new ASTString(""));
+            return new ASTNodeList(nodes);
         }
 
         private int indent() {

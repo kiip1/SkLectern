@@ -28,7 +28,6 @@ public record ASTBinaryOperator(ASTNode left, ASTNode right, BinaryOperator oper
     }
 
     public enum BinaryOperator {
-        CONCATENATE((left, right) -> new ASTString(left.visit(null) + right.visit(null))),
         ADDITION((left, right) -> {
             if (left instanceof ASTNumber leftNumber && right instanceof ASTNumber rightNumber)
                 return new ASTNumber(leftNumber.value().add(rightNumber.value()));
