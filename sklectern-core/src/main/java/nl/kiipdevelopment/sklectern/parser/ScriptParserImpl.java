@@ -77,23 +77,24 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                 return new ASTStructureMacroReference(name, arguments);
             }
 
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder name = new StringBuilder();
             while (!(current.type() == TokenType.COLON && peek().type() == TokenType.END)) {
-                builder.append(current.spaced());
+                name.append(current.spaced());
                 next();
             }
             eat(TokenType.COLON);
             eat(TokenType.END);
 
             final int indentation = indent();
-            if (builder.toString().startsWith("command") && peek().type() == TokenType.COLON) { // Structure
+            // TODO Don't hardcode this
+            if ((name.toString().startsWith("command") || name.toString().equals("options")) && peek().type() == TokenType.COLON) { // Structure
                 List<ASTStatement> entries = new ArrayList<>();
                 do entries.add(entry());
                 while (this.indentation >= indentation);
 
-                return new ASTStruct(builder.toString(), entries);
+                return new ASTStruct(name.toString(), entries);
             } else { // Trigger
-                return new ASTStruct(builder.toString(), List.of(new ASTStructureEntry<>(null, statementList())));
+                return new ASTStruct(name.toString(), List.of(new ASTStructureEntry<>(null, statementList())));
             }
         }
 
@@ -231,8 +232,12 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             while (!closers.contains(current.type())) {
                 if (current.type() == TokenType.NUMBER ||
                         current.type() == TokenType.PLUS ||
-                        current.type() == TokenType.MINUS) nodes.add(sum());
-                else {
+                        current.type() == TokenType.MINUS) {
+
+                    if (current.spacing() == Spacing.LEFT)
+                        nodes.add(new ASTString(" "));
+                    nodes.add(sum());
+                } else {
                     nodes.add(new ASTString(current.spaced()));
                     next();
                 }
