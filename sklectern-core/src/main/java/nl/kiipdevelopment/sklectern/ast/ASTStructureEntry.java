@@ -18,6 +18,7 @@ public record ASTStructureEntry(ASTNode key, ASTNode node) implements ASTStateme
 
     @Override
     public void check(@NotNull Context context) {
+        if (key != null) key.check(context);
         node.check(context);
     }
 

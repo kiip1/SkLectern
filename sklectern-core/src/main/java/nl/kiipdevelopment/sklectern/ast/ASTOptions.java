@@ -27,7 +27,13 @@ public record ASTOptions(List<ASTStatement> entries) implements ASTStructure {
             entry.check(context);
         context.options(options -> entries.stream()
                 .map(entry -> (ASTStructureEntry) entry)
-                .forEach(entry -> options.put(entry.key().visit(context), entry.node().visit(context).trim())));
+                .forEach(entry -> {
+                    final String key = entry.key().visit(context);
+                    final String value = entry.node().visit(context).trim();
+                    if (key.isBlank()) throw new IllegalArgumentException("Option key is blank");
+                    else if (value.isBlank()) throw new IllegalArgumentException("Option value is blank");
+                    else if (options.put(key, value) != null) throw new IllegalStateException("Option '" + key + "' is already set");
+                }));
     }
 
     @Override

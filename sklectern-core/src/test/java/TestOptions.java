@@ -6,12 +6,11 @@ final class TestOptions {
     public void testOptions() {
         final Script script = new Script("options", """
         options:
-            z: y
-            y: x
+            a: "{@b}"
+            b: {@a}
         
         on join:
-            send "{@a}" to player
-            send "{@{@z}}" to player{@z}
+            send {@a} to player
         """);
 
         System.out.println(script.parse());

@@ -247,6 +247,8 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                         nodes.add(new ASTString(" "));
                     nodes.add(sum());
                 } else if (current.type() == TokenType.VARIABLE && current.value().length() >= 3 && current.value().charAt(1) == '@') {
+                    if (current.spacing() == Spacing.LEFT)
+                        nodes.add(new ASTString(" "));
                     nodes.add(new ASTOptionReference(current.value().substring(2, current.value().length() - 1)));
                     eat(TokenType.VARIABLE);
                 } else {
