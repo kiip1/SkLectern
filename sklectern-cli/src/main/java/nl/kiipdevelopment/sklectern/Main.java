@@ -1,27 +1,75 @@
 package nl.kiipdevelopment.sklectern;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.audience.MessageType;
-import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.jetbrains.annotations.NotNull;
+import com.google.common.base.Strings;
 
-import static nl.kiipdevelopment.sklectern.command.SkLecternCommand.*;
+import java.io.UncheckedIOException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 public final class Main {
-    private static final PlainTextComponentSerializer SERIALIZER = PlainTextComponentSerializer.plainText();
-    private static final Audience CONSOLE = new Audience() {
-        @Override
-        public void sendMessage(@NotNull Identity source, @NotNull Component component, @NotNull MessageType type) {
-            final String message = SERIALIZER.serialize(component);
-            if (source == STDOUT) System.out.println(message);
-            else if (source == STDERR) System.err.println(message);
-            else throw new IllegalArgumentException("Unknown source: " + source);
-        }
-    };
-
     public static void main(String[] args) {
-        COMMAND.execute(CONSOLE, "sklectern " + String.join(" ", args));
+        Path file = null;
+        Path folder = null;
+        for (String arg : Arrays.stream(args).sorted().toList()) {
+            if (arg.equals("h") || arg.equals("help") || arg.equals("-h") || arg.equals("--help")) {
+                help();
+                return;
+            } else if (arg.equals("b") || arg.equals("build")) {
+                if (folder != null) {
+                    try {
+                        SkLectern.instance().scriptManager().transformAll(folder);
+                    } catch (UncheckedIOException e) {
+                        if (e.getCause() instanceof NoSuchFileException noSuchFileException)
+                            System.err.println("Couldn't find folder " + noSuchFileException.getFile());
+                        else throw e;
+                    }
+
+                    return;
+                }
+
+                if (file == null) {
+                    System.err.println("Missing --file flag.");
+                    return;
+                }
+
+                try {
+                    SkLectern.instance().scriptManager().transform(file);
+                } catch (UncheckedIOException e) {
+                    if (e.getCause() instanceof NoSuchFileException noSuchFileException)
+                        System.err.println("Couldn't find file " + noSuchFileException.getFile());
+                    else throw e;
+                }
+
+                return;
+            } else if (arg.startsWith("-f=") || arg.startsWith("--file=")) {
+                file = Path.of(arg.split("=")[1]);
+            } else if (arg.startsWith("-d=") || arg.startsWith("--dir=") || arg.startsWith("--folder=")) {
+                folder = Path.of(arg.split("=")[1]);
+            } else {
+                System.out.println("Unrecognised flag '" + arg + "'. Use -h or --help for help.");
+                return;
+            }
+        }
+
+        help();
+    }
+
+    private static void help() {
+        System.out.println("All commands:");
+        System.out.println(pad("build, b") + "Transforms either a single file or a folder." +
+                "\n" + pad() + "(Requires either --file or --folder to be set)");
+        System.out.println();
+        System.out.println("All arguments:");
+        System.out.println(pad("-f, --file") + "Sets the file to transform.");
+        System.out.println(pad("-d, --dir, --folder") + "Sets the folder to transform.");
+    }
+
+    private static String pad() {
+        return " ".repeat(20);
+    }
+
+    private static String pad(String input) {
+        return Strings.padEnd(input, 20, ' ');
     }
 }

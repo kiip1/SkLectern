@@ -1,5 +1,6 @@
 package nl.kiipdevelopment.sklectern;
 
+import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
 import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
@@ -26,6 +27,8 @@ public record Script(String name, String source) {
     }
 
     public ASTNode parse() {
+        if (source.isBlank()) return new ASTEmpty();
+
         ScriptLexer lexer = ScriptLexer.of(source);
         ScriptParser parser = ScriptParser.of(lexer);
 

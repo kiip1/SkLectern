@@ -1,5 +1,6 @@
 package nl.kiipdevelopment.sklectern;
 
+import nl.kiipdevelopment.sklectern.command.SkLecternCommand;
 import nl.kiipdevelopment.sklectern.context.Config;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,13 +47,19 @@ public final class BukkitSkLectern extends JavaPlugin implements SkLectern {
     @Override
     public void onEnable() {
         try {
-            Files.createDirectories(config.scriptFolder());
-            Files.createDirectories(config.distributionFolder());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            try {
+                Files.createDirectories(config.scriptFolder());
+                Files.createDirectories(config.distributionFolder());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-        scriptManager.transformAll();
+            SkLecternCommand.COMMAND.register(this);
+
+            scriptManager.transformAll();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
