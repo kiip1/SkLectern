@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -35,16 +34,36 @@ public final class ParseException extends IllegalArgumentException {
 	
 	public ParseException(int position, @NotNull String script, @Nullable String message) {
 		// The line number doesn't work all the time
-		this((script.substring(0, position - 1) +
-                ">>>" + script.charAt(position - 1) + "<<<" +
-                script.substring(position) +
-                (message == null ? "" : " [" + message + ", line " + script.chars().limit(position).filter(x -> x == '\n').count() + "]")));
+		this(transform(position, script, message));
 	}
 	
 	public ParseException(@NotNull String message) {
-		super(((Function<String, String>) x -> {
-			String[] parts = message.split("\n");
-			return parts[parts.length - 1];
-		}).apply(message), null);
+		super(message, null);
 	}
+
+    private static @NotNull String transform(int position, @NotNull String script, @Nullable String message) {
+        final StringBuilder builder = new StringBuilder();
+        final String prefix = script.substring(0, position - 1);
+        final String suffix = script.substring(position);
+        builder.append(prefix.substring(prefix.lastIndexOf("\n") + 1));
+        builder.append(">>>");
+        builder.append(script.charAt(position - 1));
+        builder.append("<<<");
+        if (suffix.contains("\n")) builder.append(suffix, 0, suffix.indexOf("\n"));
+        else builder.append(suffix);
+
+        if (message != null) {
+            final long line = script.substring(0, position)
+                    .chars()
+                    .filter(character -> character == '\n')
+                    .count() + 1;
+            builder.append(" [")
+                    .append(message)
+                    .append(", line ")
+                    .append(line)
+                    .append("]");
+        }
+
+        return builder.toString();
+    }
 }
