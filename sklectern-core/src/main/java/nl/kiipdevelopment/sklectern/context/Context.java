@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -25,9 +26,14 @@ public interface Context {
         return new SimpleContext();
     }
 
+    @Unmodifiable Map<String, String> options();
+
     @Unmodifiable List<Macro> macros();
 
     @Unmodifiable List<StructureMacro> structureMacros();
+
+    @Contract("_ -> this")
+    Context options(Consumer<Map<String, String>> options);
 
     @Contract("_ -> this")
     Context macros(Consumer<List<Macro>> macros);

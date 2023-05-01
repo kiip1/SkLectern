@@ -64,6 +64,8 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                 return macro(true);
             else if (current.value().equals("macro"))
                 return macro(false);
+            else if (current.value().equals("options"))
+                return options();
             else if (peek().type() == TokenType.MACRO) {
                 final String name = current.value();
                 eat(TokenType.IDENTIFIER);
@@ -87,7 +89,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             final int indentation = indent();
             // TODO Don't hardcode this
-            if ((name.toString().startsWith("command") || name.toString().equals("options")) && peek().type() == TokenType.COLON) { // Structure
+            if (name.toString().startsWith("command") && peek().type() == TokenType.COLON) { // Structure
                 List<ASTStatement> entries = new ArrayList<>();
                 do entries.add(entry());
                 while (this.indentation >= indentation);
@@ -122,8 +124,22 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             else return new ASTMacro(name, arguments, statementList());
         }
 
+        private @NotNull ASTStructure options() {
+            eat(TokenType.IDENTIFIER);
+            eat(TokenType.COLON);
+            eat(TokenType.END);
+            List<ASTStatement> entries = new ArrayList<>();
+            final int indentation = indent();
+            do entries.add(entry());
+            while (this.indentation >= indentation);
+
+            return new ASTOptions(entries);
+        }
+
         private @NotNull ASTStructureEntry entry() {
-            final ASTNode key = element(List.of(TokenType.COLON));
+            final ASTNode key = element(List.of(TokenType.COLON, TokenType.END));
+            if (previous.type() == TokenType.END)
+                throw new ParseException(lexer, parser.script(), TokenType.COLON, TokenType.END);
             final boolean statementList = ifEat(TokenType.END);
 
             if (statementList) return new ASTStructureEntry(key, statementList());
@@ -230,6 +246,9 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     if (current.spacing() == Spacing.LEFT)
                         nodes.add(new ASTString(" "));
                     nodes.add(sum());
+                } else if (current.type() == TokenType.VARIABLE && current.value().length() >= 3 && current.value().charAt(1) == '@') {
+                    nodes.add(new ASTOptionReference(current.value().substring(2, current.value().length() - 1)));
+                    eat(TokenType.VARIABLE);
                 } else {
                     nodes.add(new ASTString(current.spaced()));
                     next();

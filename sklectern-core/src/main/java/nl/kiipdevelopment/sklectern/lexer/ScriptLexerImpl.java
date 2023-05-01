@@ -2,6 +2,7 @@ package nl.kiipdevelopment.sklectern.lexer;
 
 import com.google.common.math.IntMath;
 import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
+import nl.kiipdevelopment.sklectern.parser.ParseException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -198,6 +199,8 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
                 else if (chars.peek() == TokenType.CURLY_CLOSE.value) depth--;
                 result.append(chars.poll());
             } while (!chars.isEmpty() && depth > 0);
+
+            if (depth > 0) throw new ParseException("Unclosed variable");
 
             return new Token(TokenType.VARIABLE, result.toString(), spacing);
         }
