@@ -25,7 +25,7 @@ public record ASTStructureMacroReference(String name, ASTNodeList arguments) imp
             argument.check(context);
         for (StructureMacro macro : context.structureMacros())
             if (macro.name().equals(name) && macro.parameters().size() != arguments.nodes().size())
-                throw new ParseException("Macro " + name + " expected " + macro.parameters().size() + " arguments, " +
+                throw new ParseException("Macro '" + name + "' expected " + macro.parameters().size() + " arguments, " +
                         "but received " + arguments.nodes().size());
     }
 
@@ -39,7 +39,7 @@ public record ASTStructureMacroReference(String name, ASTNodeList arguments) imp
             if (macro.name().equals(name))
                 return macro.apply(arguments).visit(context);
 
-        throw new ParseException("Reference to unknown macro " + name);
+        throw new ParseException("Reference to unknown macro '" + name + "'");
     }
 
     @Override

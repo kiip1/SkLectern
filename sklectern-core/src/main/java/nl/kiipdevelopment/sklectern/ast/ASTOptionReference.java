@@ -23,6 +23,6 @@ public record ASTOptionReference(String name) implements ASTNode {
             if (option.getKey().equals(name))
                 return option.getValue();
 
-        throw new ParseException("Reference to unknown option " + name);
+        throw new ParseException("Reference to unknown option '" + name + "'");
     }
 }

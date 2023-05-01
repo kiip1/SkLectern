@@ -25,7 +25,7 @@ public record ASTMacroReference(String name, ASTNodeList arguments) implements A
             argument.check(context);
         for (Macro macro : context.macros())
             if (macro.name().equals(name) && macro.parameters().size() != arguments.nodes().size())
-                throw new ParseException("Macro " + name + " expected " + macro.parameters().size() + " arguments, " +
+                throw new ParseException("Macro '" + name + "' expected " + macro.parameters().size() + " arguments, " +
                         "but received " + arguments.nodes().size());
     }
 
@@ -39,6 +39,6 @@ public record ASTMacroReference(String name, ASTNodeList arguments) implements A
             if (macro.name().equals(name))
                 return macro.apply(arguments).get(context);
 
-        throw new ParseException("Reference to unknown macro " + name);
+        throw new ParseException("Reference to unknown macro '" + name + "'");
     }
 }
