@@ -7,6 +7,10 @@ Supercharge your scripts with various new language features and performance gain
 
 Please do note that this is just a proof of concept, and the result is by no means production grade.
 
+## Installation
+Go [here](https://github.com/kiip1/SkLectern/releases/tag/latest) for the latest release.
+Install either the Bukkit version or CLI.
+
 ## Features
 - [Macros](#macros)
 - [Arithmetic](#arithmetic)
