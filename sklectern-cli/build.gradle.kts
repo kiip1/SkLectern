@@ -9,8 +9,19 @@ repositories {
 }
 
 dependencies {
+    val junitVersion: String by project
+
     implementation(project(":sklectern-shared"))
     implementation(project(":sklectern-core"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
 }
 
 application {

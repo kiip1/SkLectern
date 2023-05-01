@@ -10,5 +10,6 @@ final class TestShake {
         """);
 
         System.out.println(script.parse());
+        System.out.println(script.transform());
     }
 }
