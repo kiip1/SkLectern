@@ -19,11 +19,16 @@ public enum TokenType {
     VARIABLE,
     IDENTIFIER,
 
-    PLUS('+'),
-    MINUS('-'),
-    MULTIPLY('*'),
-    DIVIDE('/'),
+    PLUS('+', true),
+    MINUS('-', true),
+    MULTIPLY('*', true),
+    DIVIDE('/', true),
     EXPONENT('^'),
+
+    VECTOR_PLUS("++"),
+    VECTOR_MINUS("--"),
+    VECTOR_MULTIPLY("**"),
+    VECTOR_DIVIDE("//"),
 
     PARENTHESIS_OPEN('('),
     PARENTHESIS_CLOSE(')'),
@@ -38,7 +43,7 @@ public enum TokenType {
     INDENT,
     END;
 
-    private static final Map<Character, TokenType> BY_VALUE = new HashMap<>();
+    private static final Map<String, TokenType> BY_VALUE = new HashMap<>();
 
     static {
         for (TokenType type : values())
@@ -46,30 +51,43 @@ public enum TokenType {
                 BY_VALUE.put(type.value, type);
     }
 
-    @Nullable
-    public final Character value;
+    public final @Nullable String value;
+    public final boolean checkDouble;
 
     TokenType() {
         value = null;
+        checkDouble = false;
     }
 
     TokenType(char value) {
+        this(value, false);
+    }
+
+    TokenType(char value, boolean checkDouble) {
+        this(String.valueOf(value), checkDouble);
+    }
+
+    TokenType(@NotNull String value) {
+        this(value, false);
+    }
+
+    TokenType(@NotNull String value, boolean checkDouble) {
         this.value = value;
+        this.checkDouble = checkDouble;
     }
 
     @Override
     public @NotNull String toString() {
         if (value == null)
             return name().toLowerCase(Locale.ENGLISH);
-
-        return value.toString();
+        return value;
     }
 
-    public static @Nullable TokenType typeOfCharacter(char character) {
+    public static @Nullable TokenType typeOfCharacter(String character) {
         return BY_VALUE.get(character);
     }
 
-    public static boolean noAssociatedValue(char character) {
+    public static boolean noAssociatedValue(String character) {
         return BY_VALUE.get(character) == null;
     }
 }

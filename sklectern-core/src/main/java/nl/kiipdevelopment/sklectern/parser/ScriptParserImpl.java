@@ -1,7 +1,7 @@
 package nl.kiipdevelopment.sklectern.parser;
 
 import nl.kiipdevelopment.sklectern.ast.*;
-import nl.kiipdevelopment.sklectern.ast.ASTBinaryOperator.BinaryOperator;
+import nl.kiipdevelopment.sklectern.ast.ASTBinaryOperator.BinaryOperation;
 import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 import nl.kiipdevelopment.sklectern.lexer.Token;
 import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
@@ -60,11 +60,11 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         }
 
         private @NotNull ASTStructure structure() {
-            if (current.value().equals("structure") && peek().value().equals("macro"))
+            if (current.value().equalsIgnoreCase("structure") && peek().value().equalsIgnoreCase("macro"))
                 return macro(true);
-            else if (current.value().equals("macro"))
+            else if (current.value().equalsIgnoreCase("macro"))
                 return macro(false);
-            else if (current.value().equals("options"))
+            else if (current.value().equalsIgnoreCase("options"))
                 return options();
             else if (peek().type() == TokenType.MACRO) {
                 final String name = current.value();
@@ -89,7 +89,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             final int indentation = indent();
             // TODO Don't hardcode this
-            if (name.toString().startsWith("command") && peek().type() == TokenType.COLON) { // Structure
+            if (name.toString().startsWith("command")) { // Structure
                 List<ASTStatement> entries = new ArrayList<>();
                 do entries.add(entry());
                 while (this.indentation >= indentation);
@@ -185,9 +185,20 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             final Token current = this.current;
             next();
-            if (current.type() == TokenType.NUMBER)
-                return new ASTNumber(new BigDecimal(current.value()));
-            return new ASTString(current.value());
+            if (current.type() == TokenType.NUMBER) return new ASTNumber(new BigDecimal(current.value()));
+            else if (current.value().equals("vector")) {
+                eat(TokenType.PARENTHESIS_OPEN);
+                final BigDecimal x = new BigDecimal(this.current.value());
+                eat(TokenType.NUMBER);
+                eat(TokenType.COMMA);
+                final BigDecimal y = new BigDecimal(this.current.value());
+                eat(TokenType.NUMBER);
+                eat(TokenType.COMMA);
+                final BigDecimal z = new BigDecimal(this.current.value());
+                eat(TokenType.NUMBER);
+                eat(TokenType.PARENTHESIS_CLOSE);
+                return new ASTVector(x, y, z);
+            } else return new ASTString(current.value());
         }
 
         private ASTNode power() {
@@ -195,7 +206,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             while (current.type() == TokenType.EXPONENT) {
                 eat(TokenType.EXPONENT);
-                node = new ASTBinaryOperator(node, factor(), BinaryOperator.EXPONENTIATION);
+                node = new ASTBinaryOperator(node, factor(), TokenType.EXPONENT, BinaryOperation.EXPONENTIATION);
             }
 
             return node;
@@ -204,17 +215,18 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private ASTNode term() {
             ASTNode node = power();
 
-            while (current.type() == TokenType.MULTIPLY || current.type() == TokenType.DIVIDE) {
-                final BinaryOperator operator;
-                if (current.type() == TokenType.MULTIPLY) {
-                    eat(TokenType.MULTIPLY);
-                    operator = BinaryOperator.MULTIPLICATION;
+            while (current.type() == TokenType.MULTIPLY || current.type() == TokenType.VECTOR_MULTIPLY || current.type() == TokenType.DIVIDE || current.type() == TokenType.VECTOR_DIVIDE) {
+                final TokenType type;
+                final BinaryOperation operator;
+                if (current.type() == TokenType.MULTIPLY || current.type() == TokenType.VECTOR_MULTIPLY) {
+                    type = eat(TokenType.MULTIPLY, TokenType.VECTOR_MULTIPLY);
+                    operator = BinaryOperation.MULTIPLICATION;
                 } else {
-                    eat(TokenType.DIVIDE);
-                    operator = BinaryOperator.DIVISION;
+                    type = eat(TokenType.DIVIDE, TokenType.VECTOR_DIVIDE);
+                    operator = BinaryOperation.DIVISION;
                 }
 
-                node = new ASTBinaryOperator(node, power(), operator);
+                node = new ASTBinaryOperator(node, power(), type, operator);
             }
 
             return node;
@@ -223,17 +235,18 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private ASTNode sum() {
             ASTNode node = term();
 
-            while (current.type() == TokenType.PLUS || current.type() == TokenType.MINUS) {
-                final BinaryOperator operator;
-                if (current.type() == TokenType.PLUS) {
-                    eat(TokenType.PLUS);
-                    operator = BinaryOperator.ADDITION;
+            while (current.type() == TokenType.PLUS || current.type() == TokenType.VECTOR_PLUS || current.type() == TokenType.MINUS || current.type() == TokenType.VECTOR_MINUS) {
+                final TokenType type;
+                final BinaryOperation operator;
+                if (current.type() == TokenType.PLUS || current.type() == TokenType.VECTOR_PLUS) {
+                    type = eat(TokenType.PLUS, TokenType.VECTOR_PLUS);
+                    operator = BinaryOperation.ADDITION;
                 } else {
-                    eat(TokenType.MINUS);
-                    operator = BinaryOperator.SUBTRACTION;
+                    type = eat(TokenType.MINUS, TokenType.VECTOR_MINUS);
+                    operator = BinaryOperation.SUBTRACTION;
                 }
 
-                node = new ASTBinaryOperator(node, term(), operator);
+                node = new ASTBinaryOperator(node, term(), type, operator);
             }
 
             return node;
@@ -242,18 +255,15 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private @NotNull ASTNode element(@NotNull List<TokenType> closers) {
             final List<ASTNode> nodes = new ArrayList<>();
             while (!closers.contains(current.type())) {
-                if (current.type() == TokenType.NUMBER || current.type() == TokenType.PLUS || current.type() == TokenType.MINUS) {
-                    if (current.spacing() == Spacing.LEFT)
-                        nodes.add(new ASTString(" "));
-                    nodes.add(sum());
-                } else if (current.type() == TokenType.VARIABLE && current.value().length() >= 3 && current.value().charAt(1) == '@') {
+                if (current.type() == TokenType.VARIABLE && current.value().length() >= 3 && current.value().charAt(1) == '@') {
                     if (current.spacing() == Spacing.LEFT)
                         nodes.add(new ASTString(" "));
                     nodes.add(new ASTOptionReference(current.value().substring(2, current.value().length() - 1)));
                     eat(TokenType.VARIABLE);
                 } else {
-                    nodes.add(new ASTString(current.spaced()));
-                    next();
+                    if (current.spacing() == Spacing.LEFT)
+                        nodes.add(new ASTString(" "));
+                    nodes.add(sum());
                 }
             }
             if (ifEat(closers.toArray(TokenType[]::new)) == null)
@@ -286,13 +296,21 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             return lexer.peekBefore(type);
         }
 
-        private void eat(TokenType type) {
+        private @NotNull TokenType eat(@NotNull TokenType type) {
             if (current.type() != type)
                 throw new ParseException(lexer, parser.script(), type, current.type());
             next();
+
+            return type;
         }
 
-        private boolean ifEat(TokenType type) {
+        private @NotNull TokenType eat(@NotNull TokenType @NotNull ... types) {
+            final TokenType type = ifEat(types);
+            if (type == null) throw new ParseException(lexer, parser.script(), types[0], current.type());
+            return type;
+        }
+
+        private boolean ifEat(@NotNull TokenType type) {
             if (current.type() == type) {
                 next();
                 return true;
@@ -301,7 +319,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             return false;
         }
 
-        private @Nullable TokenType ifEat(TokenType @NotNull ... types) {
+        private @Nullable TokenType ifEat(@NotNull TokenType @NotNull ... types) {
             for (TokenType type : types)
                 if (ifEat(type))
                     return type;

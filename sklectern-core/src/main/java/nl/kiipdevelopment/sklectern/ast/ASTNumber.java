@@ -8,6 +8,10 @@ import java.math.BigDecimal;
 
 @ApiStatus.Internal
 public record ASTNumber(BigDecimal value) implements ASTLiteral<BigDecimal> {
+    public @NotNull ASTVector vector() {
+        return new ASTVector(value, value, value);
+    }
+
     @Override
     public void check(@NotNull Context context) {}
 

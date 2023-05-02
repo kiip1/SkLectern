@@ -80,21 +80,27 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 				return number();
 			}
 
-			if (next == TokenType.QUOTE.value) {
+			if (next.toString().equals(TokenType.QUOTE.value)) {
 				previous = TokenType.STRING;
 				return string();
 			}
 
-            if (next == TokenType.CURLY_OPEN.value) {
+            if (next.toString().equals(TokenType.CURLY_OPEN.value)) {
                 previous = TokenType.VARIABLE;
                 return variable();
             }
 
-            final TokenType tokenType = TokenType.typeOfCharacter(next);
+            String value = next.toString();
+            TokenType tokenType = TokenType.typeOfCharacter(value);
 			if (tokenType != null) {
 				chars.poll();
+                if (tokenType.checkDouble && chars.peek().toString().equals(tokenType.value)) {
+                    value += chars.poll();
+                    tokenType = TokenType.typeOfCharacter(value);
+                }
+
 				previous = tokenType;
-				return new Token(tokenType, next.toString(), spacing);
+				return new Token(tokenType, value, spacing);
 			}
 
 			previous = TokenType.IDENTIFIER;
@@ -175,7 +181,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		private @NotNull Token identifier() {
 			final StringBuilder result = new StringBuilder();
 			do result.append(chars.poll());
-			while (!chars.isEmpty() && chars.peek() != '\n' && chars.peek() != ' ' && !Character.isDigit(chars.peek()) && TokenType.noAssociatedValue(chars.peek()));
+			while (!chars.isEmpty() && chars.peek() != '\n' && chars.peek() != ' ' && !Character.isDigit(chars.peek()) && TokenType.noAssociatedValue(chars.peek().toString()));
 
 			return new Token(TokenType.IDENTIFIER, result.toString(), spacing);
 		}
@@ -183,7 +189,7 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
 		private @NotNull Token string() {
 			final StringBuilder result = new StringBuilder();
 			chars.poll();
-			while (!chars.isEmpty() && chars.peek() != TokenType.QUOTE.value)
+			while (!chars.isEmpty() && !chars.peek().toString().equals(TokenType.QUOTE.value))
 				result.append(chars.poll());
 			chars.poll();
 
@@ -195,8 +201,8 @@ record ScriptLexerImpl(String script) implements ScriptLexer {
             final StringBuilder result = new StringBuilder();
             int depth = 0;
             do {
-                if (chars.peek() == TokenType.CURLY_OPEN.value) depth++;
-                else if (chars.peek() == TokenType.CURLY_CLOSE.value) depth--;
+                if (chars.peek().toString().equals(TokenType.CURLY_OPEN.value)) depth++;
+                else if (chars.peek().toString().equals(TokenType.CURLY_CLOSE.value)) depth--;
                 result.append(chars.poll());
             } while (!chars.isEmpty() && depth > 0);
 

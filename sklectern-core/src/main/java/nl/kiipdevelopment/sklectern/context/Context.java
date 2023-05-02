@@ -16,14 +16,12 @@ import java.util.function.Consumer;
  * Context gets populated during the {@link ASTNode#check(Context)} phase,
  * and then used in the {@link ASTNode#visit(Context)} phase.
  * <p>
- * It only stores macros for now, but in the future more uses may be added.
- * <p>
  * Note: This may become immutable later on depending on the direction {@link ASTNode} is heading in.
  */
 @ApiStatus.Experimental
-public interface Context {
+public sealed interface Context permits ContextImpl, MathContext {
     static @NotNull Context of() {
-        return new SimpleContext();
+        return new ContextImpl();
     }
 
     @Unmodifiable Map<String, String> options();

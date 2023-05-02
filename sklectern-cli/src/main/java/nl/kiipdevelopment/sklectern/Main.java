@@ -12,10 +12,10 @@ public final class Main {
         Path file = null;
         Path folder = null;
         for (String arg : Arrays.stream(args).sorted().toList()) {
-            if (arg.equals("h") || arg.equals("help") || arg.equals("-h") || arg.equals("--help")) {
+            if (arg.equalsIgnoreCase("h") || arg.equalsIgnoreCase("help") || arg.equalsIgnoreCase("-h") || arg.equalsIgnoreCase("--help")) {
                 help();
                 return;
-            } else if (arg.equals("b") || arg.equals("build")) {
+            } else if (arg.equalsIgnoreCase("b") || arg.equalsIgnoreCase("build")) {
                 if (folder != null) {
                     try {
                         SkLectern.instance().scriptManager().transformAll(folder);
