@@ -183,7 +183,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                 eat(TokenType.PARENTHESIS_OPEN);
                 final ASTNode node = element(List.of(TokenType.PARENTHESIS_CLOSE));
                 return new ASTGroup<>(node);
-            } else if (current.type() == TokenType.MINUS) {
+            } else if (current.type() == TokenType.MINUS && peek().spacing() == Spacing.NONE) {
                 eat(TokenType.MINUS);
                 return new ASTUnaryOperator<>(factor(), TokenType.MINUS, UnaryOperation.SUBTRACTION);
             }
@@ -262,10 +262,20 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private @NotNull ASTNode element(@NotNull List<TokenType> closers) {
             final List<ASTNode> nodes = new ArrayList<>();
             while (!closers.contains(current.type())) {
-                if (current.type() == TokenType.VARIABLE && current.value().length() >= 3 && current.value().charAt(1) == '@') {
-                    if (current.spacing() == Spacing.LEFT)
-                        nodes.add(new ASTString(" "));
-                    nodes.add(new ASTOptionReference(current.value().substring(2, current.value().length() - 1)));
+                if (current.type() == TokenType.VARIABLE) {
+                    if (!current.value().matches("\\{.+}"))
+                        throw new ParseException(lexer, parser.script(), "Malformed variable");
+
+                    if (current.value().charAt(1) == '@') {
+                        if (current.spacing() == Spacing.LEFT)
+                            nodes.add(new ASTString(" "));
+                        nodes.add(new ASTOptionReference(current.value().substring(2, current.value().length() - 1)));
+                    } else {
+                        if (current.spacing() == Spacing.LEFT)
+                            nodes.add(new ASTString(" "));
+                        nodes.add(new ASTVariableReference(current.value().substring(1, current.value().length() - 1)));
+                    }
+
                     eat(TokenType.VARIABLE);
                 } else {
                     if (current.spacing() == Spacing.LEFT)
