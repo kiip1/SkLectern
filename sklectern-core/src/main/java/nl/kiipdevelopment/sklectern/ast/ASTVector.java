@@ -4,49 +4,70 @@ import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.function.BinaryOperator;
 
 @ApiStatus.Internal
-public record ASTVector(Vector3D value) implements ASTLiteral<ASTVector.Vector3D> {
-    public ASTVector(BigDecimal x, BigDecimal y, BigDecimal z) {
-        this(new Vector3D(x, y, z));
-    }
-
-    @Override
-    public void check(@NotNull Context context) {}
-
-    @Override
-    public @NotNull String visit() {
-        return value.toString();
-    }
-
-    public record Vector3D(@NotNull BigDecimal x, @NotNull BigDecimal y, @NotNull BigDecimal z) {
-        @Contract("_ -> new")
-        public @NotNull Vector3D add(@NotNull Vector3D other) {
-            return new Vector3D(x.add(other.x), y.add(other.y), z.add(other.z));
+@ApiStatus.NonExtendable
+public interface ASTVector extends ASTValue<ASTLiteralVector.Vector3D> {
+    record Vector3D(@NotNull ASTNode x, @NotNull ASTNode y, @NotNull ASTNode z) {
+        @Contract("_, _ -> new")
+        public @NotNull Vector3D add(@NotNull Context context, @NotNull Vector3D other) {
+            return vectorOperation(context, BigDecimal::add, "+", this, other);
         }
 
-        @Contract("_ -> new")
-        public @NotNull Vector3D subtract(@NotNull Vector3D other) {
-            return new Vector3D(x.subtract(other.x), y.subtract(other.y), z.subtract(other.z));
+        @Contract("_, _ -> new")
+        public @NotNull Vector3D subtract(@NotNull Context context, @NotNull Vector3D other) {
+            return vectorOperation(context, BigDecimal::subtract, "-", this, other);
         }
 
-        @Contract("_ -> new")
-        public @NotNull Vector3D multiply(@NotNull Vector3D other) {
-            return new Vector3D(x.multiply(other.x), y.multiply(other.y), z.multiply(other.z));
+        @Contract("_, _ -> new")
+        public @NotNull Vector3D multiply(@NotNull Context context, @NotNull Vector3D other) {
+            return vectorOperation(context, BigDecimal::multiply, "*", this, other);
         }
 
-        @Contract("_ -> new")
-        public @NotNull Vector3D divide(@NotNull Vector3D other) {
-            return new Vector3D(x.divide(other.x, RoundingMode.HALF_UP), y.divide(other.y, RoundingMode.HALF_UP),
-                    z.divide(other.z, RoundingMode.HALF_UP));
+        @Contract("_, _ -> new")
+        public @NotNull Vector3D divide(@NotNull Context context, @NotNull Vector3D other) {
+            return vectorOperation(context, (a, b) -> a.divide(b, RoundingMode.HALF_UP), "/", this, other);
         }
 
         @Override
         public String toString() {
-            return "vector(" + x + "," + y + "," + z + ")";
+            return "vector(" + x.visit(Context.of()) + "," + y.visit(Context.of()) + "," + z.visit(Context.of()) + ")";
+        }
+
+        private static @Nullable BigDecimal from(@NotNull Context context, @NotNull ASTNode node) {
+            try {
+                return new BigDecimal(node.visit(context).trim());
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        private static @NotNull ASTNode operation(
+                @NotNull Context context, @NotNull BinaryOperator<BigDecimal> operation,
+                @NotNull String operator, @NotNull ASTNode a, @NotNull ASTNode b
+        ) {
+            final BigDecimal decimalA = from(context, a);
+            final BigDecimal decimalB = from(context, b);
+            return (decimalA != null && decimalB != null)
+                    ? new ASTLiteralNumber(operation.apply(decimalA, decimalB))
+                    : new ASTNodeList(List.of(a, new ASTString(operator), b));
+        }
+
+        private static @NotNull Vector3D vectorOperation(
+                @NotNull Context context, @NotNull BinaryOperator<BigDecimal> operation,
+                @NotNull String operator, @NotNull Vector3D a, @NotNull Vector3D b
+        ) {
+            return new Vector3D(
+                    operation(context, operation, operator, a.x, b.x),
+                    operation(context, operation, operator, a.y, b.y),
+                    operation(context, operation, operator, a.z, b.z)
+            );
         }
     }
 }

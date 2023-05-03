@@ -1,5 +1,6 @@
 package nl.kiipdevelopment.sklectern.context;
 
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.lexer.TokenType;
 import nl.kiipdevelopment.sklectern.parser.Macro;
 import nl.kiipdevelopment.sklectern.parser.StructureMacro;
@@ -10,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-final class MathContextImpl<T> implements MathContext<T> {
+final class MathContextImpl implements MathContext {
     private final Context context;
-    private final T left;
-    private final T right;
+    private final ASTNode left;
+    private final ASTNode right;
     private final TokenType operator;
 
-    public MathContextImpl(Context context, T left, T right, TokenType operator) {
+    public MathContextImpl(Context context, ASTNode left, ASTNode right, TokenType operator) {
         this.context = context;
         this.left = left;
         this.right = right;
@@ -24,12 +25,12 @@ final class MathContextImpl<T> implements MathContext<T> {
     }
 
     @Override
-    public @NotNull T left() {
+    public @NotNull ASTNode left() {
         return left;
     }
 
     @Override
-    public @NotNull T right() {
+    public @NotNull ASTNode right() {
         return right;
     }
 

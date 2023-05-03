@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This is the base for all AST elements, 
  */
-@ApiStatus.Experimental
+@ApiStatus.Internal
 @ApiStatus.NonExtendable
 public interface ASTNode {
     /**

@@ -31,9 +31,9 @@ public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements 
     public enum UnaryOperator {
         SUBTRACTION((context, input) -> {
             if (input instanceof ASTNumber number)
-                return new ASTNumber(number.value().multiply(BigDecimal.valueOf(-1)));
+                return new ASTLiteralNumber(number.value(context).multiply(BigDecimal.valueOf(-1)));
             if (input instanceof ASTLiteral<?> literal)
-                return new ASTString("-" + literal.visit());
+                return new ASTString("-" + literal.visit(context));
 
             throw new ParseException("Attempted subtraction on " + input);
         });
@@ -45,7 +45,7 @@ public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements 
         }
 
         public @NotNull ASTNode apply(@NotNull Context context, @NotNull ASTNode input) {
-            if (input instanceof ASTBinaryOperator operator)
+            if (input instanceof ASTBinaryOperator<?> operator)
                 return apply(context, operator.apply(context));
 
             if (input instanceof ASTUnaryOperator operator)

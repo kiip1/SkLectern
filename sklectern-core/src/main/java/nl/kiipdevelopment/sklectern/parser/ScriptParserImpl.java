@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nl.kiipdevelopment.sklectern.ast.ASTUnaryOperator.*;
+import static nl.kiipdevelopment.sklectern.ast.ASTUnaryOperator.UnaryOperator;
 
 record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
     @Override
@@ -178,26 +178,24 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         }
 
         private ASTNode factor() {
-            if (current.type() == TokenType.MINUS) {
+            if (current.type() == TokenType.PARENTHESIS_OPEN) {
+                eat(TokenType.PARENTHESIS_OPEN);
+                final ASTNode node = element(List.of(TokenType.PARENTHESIS_CLOSE));
+                return new ASTGroup<>(node);
+            } else if (current.type() == TokenType.MINUS) {
                 eat(TokenType.MINUS);
                 return new ASTUnaryOperator(factor(), UnaryOperator.SUBTRACTION);
             }
 
             final Token current = this.current;
             next();
-            if (current.type() == TokenType.NUMBER) return new ASTNumber(new BigDecimal(current.value()));
+            if (current.type() == TokenType.NUMBER) return new ASTLiteralNumber(new BigDecimal(current.value()));
             else if (current.value().equals("vector")) {
                 eat(TokenType.PARENTHESIS_OPEN);
-                final BigDecimal x = new BigDecimal(this.current.value());
-                eat(TokenType.NUMBER);
-                eat(TokenType.COMMA);
-                final BigDecimal y = new BigDecimal(this.current.value());
-                eat(TokenType.NUMBER);
-                eat(TokenType.COMMA);
-                final BigDecimal z = new BigDecimal(this.current.value());
-                eat(TokenType.NUMBER);
-                eat(TokenType.PARENTHESIS_CLOSE);
-                return new ASTVector(x, y, z);
+                final ASTNode x = element(List.of(TokenType.COMMA));
+                final ASTNode y = element(List.of(TokenType.COMMA));
+                final ASTNode z = element(List.of(TokenType.PARENTHESIS_CLOSE));
+                return new ASTLiteralVector(x, y, z);
             } else return new ASTString(current.value());
         }
 
@@ -206,7 +204,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             while (current.type() == TokenType.EXPONENT) {
                 eat(TokenType.EXPONENT);
-                node = new ASTBinaryOperator(node, factor(), TokenType.EXPONENT, BinaryOperation.EXPONENTIATION);
+                node = new ASTBinaryOperator<>(node, factor(), TokenType.EXPONENT, BinaryOperation.EXPONENTIATION);
             }
 
             return node;
@@ -226,7 +224,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     operator = BinaryOperation.DIVISION;
                 }
 
-                node = new ASTBinaryOperator(node, power(), type, operator);
+                node = new ASTBinaryOperator<>(node, power(), type, operator);
             }
 
             return node;
@@ -246,7 +244,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     operator = BinaryOperation.SUBTRACTION;
                 }
 
-                node = new ASTBinaryOperator(node, term(), type, operator);
+                node = new ASTBinaryOperator<>(node, term(), type, operator);
             }
 
             return node;
@@ -326,7 +324,5 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             return null;
         }
-
     }
-
 }

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@ApiStatus.Experimental
+@ApiStatus.Internal
 @ApiStatus.NonExtendable
 public interface ASTStructure extends ASTNode {
     @NotNull String name();

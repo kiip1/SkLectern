@@ -1,5 +1,4 @@
 import nl.kiipdevelopment.sklectern.Script;
-import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 import org.junit.jupiter.api.Test;
 
 final class TestArithmetic {
@@ -7,12 +6,15 @@ final class TestArithmetic {
     public void testArithmetic() {
         final Script script = new Script("arithmetic", """
         on join:
-            send 2 ++ 3 to player
-            send vector(0, 1, 0) ++ vector(1, 2, 3) ** -1 to player
+            send (2 + 3) ** vector(3, 3, 3) to player
+            send 2 + 3 ** vector(3, 3, 3) to player
+            send vector(0, 1, 0) ++ vector(1, 2 * 10 - 5, 3) * -1 to player
             send {_a} ++ vector(0, 3, 0) to player
+            send (2 + {_a}) ** vector(3, 3, 3 * {_b}) - 3 + 2 to player
+            send (2 + 3) ** vector(3, 3, 3 + {_b}) * 3 + 2 to player
+            send (2 + 3) ** vector(3, 3, 3 * 3) - 3 + 2 to player
         """);
 
-        ScriptLexer.of(script.source()).instance().iterator().forEachRemaining(System.out::println);
         System.out.println(script.parse());
         System.out.println(script.transform());
     }
