@@ -33,7 +33,6 @@ public final class ParseException extends IllegalArgumentException {
 	}
 	
 	public ParseException(int position, @NotNull String script, @Nullable String message) {
-		// The line number doesn't work all the time
 		this(transform(position, script, message));
 	}
 	
@@ -64,6 +63,6 @@ public final class ParseException extends IllegalArgumentException {
                     .append("]");
         }
 
-        return builder.toString();
+        return builder.toString().replaceAll("\n", "");
     }
 }
