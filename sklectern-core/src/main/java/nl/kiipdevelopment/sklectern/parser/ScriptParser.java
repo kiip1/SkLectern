@@ -1,7 +1,7 @@
 package nl.kiipdevelopment.sklectern.parser;
 
 import nl.kiipdevelopment.sklectern.ast.ASTNode;
-import nl.kiipdevelopment.sklectern.ast.ASTStructureList;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureList;
 import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;

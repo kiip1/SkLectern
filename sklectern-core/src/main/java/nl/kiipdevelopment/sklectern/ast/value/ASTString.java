@@ -1,4 +1,4 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.value;
 
 import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;

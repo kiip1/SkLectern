@@ -1,6 +1,8 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.value;
 
 import ch.obermuhlner.math.big.BigDecimalMath;
+import nl.kiipdevelopment.sklectern.ast.ASTGroup;
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.context.MathContext;
 import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
@@ -53,7 +55,7 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
                 (a, b) -> a.divide(context, b))),
         EXPONENTIATION(context -> {
             if (context.left() instanceof ASTNumber left && context.right() instanceof ASTNumber right)
-                return new ASTLiteralNumber(BigDecimalMath.pow(left.value(context), right.value(context),
+                return new ASTNumber(BigDecimalMath.pow(left.value(context), right.value(context),
                         new java.math.MathContext(left.value(context).precision() +
                                 right.value(context).precision(), RoundingMode.HALF_UP)));
 
@@ -105,7 +107,7 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
                 } else if (left instanceof BigDecimal && right instanceof BigDecimal) {
                     if (context.operator().name().startsWith("VECTOR"))
                         throw new ParseException("Number math with vector operators is not supported");
-                    return new ASTLiteralNumber(numberOperator.apply((BigDecimal) left, (BigDecimal) right));
+                    return new ASTNumber(numberOperator.apply((BigDecimal) left, (BigDecimal) right));
                 }
 
             final ASTString string = new ASTString(context.left().visit(context) +

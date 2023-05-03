@@ -1,7 +1,22 @@
 package nl.kiipdevelopment.sklectern.parser;
 
 import nl.kiipdevelopment.sklectern.ast.*;
-import nl.kiipdevelopment.sklectern.ast.ASTBinaryOperator.BinaryOperation;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTEffect;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTSection;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTStatementList;
+import nl.kiipdevelopment.sklectern.ast.value.*;
+import nl.kiipdevelopment.sklectern.ast.value.ASTBinaryOperator.BinaryOperation;
+import nl.kiipdevelopment.sklectern.ast.macro.ASTMacro;
+import nl.kiipdevelopment.sklectern.ast.macro.ASTMacroCall;
+import nl.kiipdevelopment.sklectern.ast.macro.ASTStructureMacro;
+import nl.kiipdevelopment.sklectern.ast.macro.ASTStructureMacroCall;
+import nl.kiipdevelopment.sklectern.ast.option.ASTOptionReference;
+import nl.kiipdevelopment.sklectern.ast.option.ASTOptions;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStruct;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureList;
 import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 import nl.kiipdevelopment.sklectern.lexer.Token;
 import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
@@ -13,7 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nl.kiipdevelopment.sklectern.ast.ASTUnaryOperator.UnaryOperation;
+import static nl.kiipdevelopment.sklectern.ast.value.ASTUnaryOperator.UnaryOperation;
 
 record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
     @Override
@@ -203,7 +218,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
             final Token current = this.current;
             next();
-            if (current.type() == TokenType.NUMBER) return new ASTLiteralNumber(new BigDecimal(current.value()));
+            if (current.type() == TokenType.NUMBER) return new ASTNumber(new BigDecimal(current.value()));
             else if (current.type() == TokenType.IDENTIFIER && this.current.type() == TokenType.PARENTHESIS_OPEN && this.current.spacing() == Spacing.NONE) {
                 final String name = current.value();
                 eat(TokenType.PARENTHESIS_OPEN);

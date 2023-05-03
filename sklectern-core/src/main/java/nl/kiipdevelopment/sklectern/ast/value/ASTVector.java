@@ -1,5 +1,7 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.value;
 
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
+import nl.kiipdevelopment.sklectern.ast.ASTNodeList;
 import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -16,7 +18,7 @@ import java.util.function.BinaryOperator;
 public interface ASTVector extends ASTValue<ASTLiteralVector.Vector3D> {
     record Vector3D(@NotNull ASTNode x, @NotNull ASTNode y, @NotNull ASTNode z) {
         public Vector3D(@NotNull BigDecimal x, @NotNull BigDecimal y, @NotNull BigDecimal z) {
-            this(new ASTLiteralNumber(x), new ASTLiteralNumber(y), new ASTLiteralNumber(z));
+            this(new ASTNumber(x), new ASTNumber(y), new ASTNumber(z));
         }
 
         public Vector3D(@NotNull BigDecimal value) {
@@ -63,7 +65,7 @@ public interface ASTVector extends ASTValue<ASTLiteralVector.Vector3D> {
             final BigDecimal decimalA = from(context, a);
             final BigDecimal decimalB = from(context, b);
             return (decimalA != null && decimalB != null)
-                    ? new ASTLiteralNumber(operation.apply(decimalA, decimalB))
+                    ? new ASTNumber(operation.apply(decimalA, decimalB))
                     : new ASTNodeList(List.of(a, new ASTString(operator), b));
         }
 

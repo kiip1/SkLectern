@@ -1,5 +1,6 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.value;
 
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.context.MathContext;
 import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
@@ -44,7 +45,7 @@ public record ASTUnaryOperator<T>(ASTNode node, TokenType operator, UnaryOperati
             if (input instanceof ASTVector vector)
                 return new ASTLiteralVector(vector.value(context).multiply(context, new ASTVector.Vector3D(BigDecimal.valueOf(-1))));
             if (input instanceof ASTNumber number)
-                return new ASTLiteralNumber(number.value(context).negate());
+                return new ASTNumber(number.value(context).negate());
             if (input instanceof ASTLiteral<?> literal)
                 return new ASTString("-" + literal.visit(context));
 

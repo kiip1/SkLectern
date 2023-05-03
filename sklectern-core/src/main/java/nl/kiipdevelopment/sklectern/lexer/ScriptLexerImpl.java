@@ -13,11 +13,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 record ScriptLexerImpl(String script) implements ScriptLexer {
+    public ScriptLexerImpl {
+        script = script.replaceAll("(?<!#)#(?!#).*", "")
+                .replaceAll("(?m)^[ \\t]*\\r?\\n", "");
+    }
+
 	@Override
 	public @NotNull Instance instance() {
-		return new InstanceImpl(new ArrayDeque<>(script
-                .replaceAll("(?<!#)#(?!#).*", "")
-                .replaceAll("(?m)^[ \\t]*\\r?\\n", "").chars()
+		return new InstanceImpl(new ArrayDeque<>(script.chars()
 				.mapToObj(integer -> (char) integer)
 				.filter(character -> character != '\r')
 				.collect(Collectors.toList())));

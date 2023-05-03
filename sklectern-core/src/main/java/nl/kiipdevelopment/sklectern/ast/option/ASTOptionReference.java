@@ -1,5 +1,6 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.option;
 
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.parser.ParseException;
 import org.jetbrains.annotations.ApiStatus;

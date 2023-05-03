@@ -1,5 +1,9 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.macro;
 
+import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
+import nl.kiipdevelopment.sklectern.ast.ASTNodeList;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.parser.Macro;
 import nl.kiipdevelopment.sklectern.parser.ParseException;

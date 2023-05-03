@@ -1,7 +1,7 @@
 package nl.kiipdevelopment.sklectern.parser;
 
-import nl.kiipdevelopment.sklectern.ast.ASTStatement;
-import nl.kiipdevelopment.sklectern.ast.ASTTransform;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTTransform;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 

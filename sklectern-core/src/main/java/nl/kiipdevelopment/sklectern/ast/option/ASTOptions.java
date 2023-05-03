@@ -1,5 +1,10 @@
-package nl.kiipdevelopment.sklectern.ast;
+package nl.kiipdevelopment.sklectern.ast.option;
 
+import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
+import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
 import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
