@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nl.kiipdevelopment.sklectern.ast.ASTUnaryOperator.UnaryOperator;
+import static nl.kiipdevelopment.sklectern.ast.ASTUnaryOperator.UnaryOperation;
 
 record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
     @Override
@@ -184,7 +184,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                 return new ASTGroup<>(node);
             } else if (current.type() == TokenType.MINUS) {
                 eat(TokenType.MINUS);
-                return new ASTUnaryOperator(factor(), UnaryOperator.SUBTRACTION);
+                return new ASTUnaryOperator<>(factor(), TokenType.MINUS, UnaryOperation.SUBTRACTION);
             }
 
             final Token current = this.current;

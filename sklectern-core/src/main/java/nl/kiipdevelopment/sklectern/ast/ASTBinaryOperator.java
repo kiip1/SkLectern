@@ -22,8 +22,7 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
 
     @Override
     public T value(@NotNull Context context) {
-        Object object = apply(context).value(context);
-        return (T) object;
+        return (T) apply(context).value(context);
     }
 
     @Override
@@ -76,10 +75,10 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
             if (right instanceof ASTBinaryOperator<?> rightOperator)
                 return apply(context, left, rightOperator.apply(context), operator);
 
-            if (left instanceof ASTUnaryOperator leftOperator)
+            if (left instanceof ASTUnaryOperator<?> leftOperator)
                 return apply(context, leftOperator.apply(context), right, operator);
 
-            if (right instanceof ASTUnaryOperator rightOperator)
+            if (right instanceof ASTUnaryOperator<?> rightOperator)
                 return apply(context, left, rightOperator.apply(context), operator);
 
             return binaryOperator.apply(MathContext.of(context.copy(), left, right, operator));
@@ -109,12 +108,9 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
         }
 
         private static ASTVector.Vector3D toVector(Object object) {
-            if (object instanceof BigDecimal decimal) {
-                final ASTValue<?> number = new ASTLiteralNumber(decimal);
-                return new ASTVector.Vector3D(number, number, number);
-            } else if (object instanceof ASTVector.Vector3D vector3D) {
-                return vector3D;
-            } else return null;
+            if (object instanceof BigDecimal decimal) return new ASTVector.Vector3D(decimal);
+            else if (object instanceof ASTVector.Vector3D vector3D) return vector3D;
+            else return null;
         }
     }
 }

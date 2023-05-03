@@ -1,17 +1,25 @@
 package nl.kiipdevelopment.sklectern.ast;
 
 import nl.kiipdevelopment.sklectern.context.Context;
+import nl.kiipdevelopment.sklectern.context.MathContext;
+import nl.kiipdevelopment.sklectern.lexer.TokenType;
 import nl.kiipdevelopment.sklectern.parser.ParseException;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.function.Function;
 
 @ApiStatus.Internal
-public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements ASTNode {
+public record ASTUnaryOperator<T>(ASTNode node, TokenType operator, UnaryOperation operation) implements ASTValue<T> {
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTUnaryOperator(node.shake(), operator);
+        return new ASTUnaryOperator<>(node.shake(), operator, operation);
+    }
+
+    @Override
+    public T value(@NotNull Context context) {
+        return (T) apply(context).value(context);
     }
 
     @Override
@@ -24,39 +32,38 @@ public record ASTUnaryOperator(ASTNode node, UnaryOperator operator) implements 
         return apply(context).visit(context);
     }
 
-    public @NotNull ASTNode apply(@NotNull Context context) {
-        return operator.apply(context, node);
+    public @NotNull ASTValue<?> apply(@NotNull Context context) {
+        return operation.apply(context, node, operator);
     }
 
-    public enum UnaryOperator {
-        SUBTRACTION((context, input) -> {
+    public enum UnaryOperation {
+        SUBTRACTION(context -> {
+            final ASTNode input = context.left();
+
+            if (input instanceof ASTVector vector)
+                return new ASTLiteralVector(vector.value(context).multiply(context, new ASTVector.Vector3D(BigDecimal.valueOf(-1))));
             if (input instanceof ASTNumber number)
-                return new ASTLiteralNumber(number.value(context).multiply(BigDecimal.valueOf(-1)));
+                return new ASTLiteralNumber(number.value(context).negate());
             if (input instanceof ASTLiteral<?> literal)
                 return new ASTString("-" + literal.visit(context));
 
             throw new ParseException("Attempted subtraction on " + input);
         });
 
-        private final ContextUnaryOperator<ASTNode> unaryOperator;
+        private final Function<MathContext, ASTValue<?>> unaryOperator;
 
-        UnaryOperator(ContextUnaryOperator<ASTNode> unaryOperator) {
+        UnaryOperation(Function<MathContext, ASTValue<?>> unaryOperator) {
             this.unaryOperator = unaryOperator;
         }
 
-        public @NotNull ASTNode apply(@NotNull Context context, @NotNull ASTNode input) {
-            if (input instanceof ASTBinaryOperator<?> operator)
-                return apply(context, operator.apply(context));
+        public @NotNull ASTValue<?> apply(@NotNull Context context, @NotNull ASTNode input, @NotNull TokenType operator) {
+            if (input instanceof ASTBinaryOperator<?> inputOperator)
+                return apply(context, inputOperator.apply(context), operator);
 
-            if (input instanceof ASTUnaryOperator operator)
-                return apply(context, operator.apply(context));
+            if (input instanceof ASTUnaryOperator<?> inputOperator)
+                return apply(context, inputOperator.apply(context), operator);
 
-            return unaryOperator.apply(context, input);
-        }
-
-        @FunctionalInterface
-        private interface ContextUnaryOperator<T> {
-            @NotNull T apply(@NotNull Context context, @NotNull T input);
+            return unaryOperator.apply(MathContext.of(context.copy(), input, null, operator));
         }
     }
 }

@@ -13,6 +13,9 @@ final class TestArithmetic {
             send (2 + {_a}) ** vector(3, 3, 3 * {_b}) - 3 + 2 to player
             send (2 + 3) ** vector(3, 3, 3 + {_b}) * 3 + 2 to player
             send (2 + 3) ** vector(3, 3, 3 * 3) - 3 + 2 to player
+            send (-2 + 3) ** vector(-3, 3, 3 * 3) - 3 + 2 to player
+            send (2 + 3) ** -vector(3, 3, 3 * 3) - 3 + 2 to player
+            send (2 + 3) ** -vector(3, 3, 3 * 3) + 0.100009 to player
         """);
 
         System.out.println(script.parse());

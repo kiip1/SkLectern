@@ -15,6 +15,14 @@ import java.util.function.BinaryOperator;
 @ApiStatus.NonExtendable
 public interface ASTVector extends ASTValue<ASTLiteralVector.Vector3D> {
     record Vector3D(@NotNull ASTNode x, @NotNull ASTNode y, @NotNull ASTNode z) {
+        public Vector3D(@NotNull BigDecimal x, @NotNull BigDecimal y, @NotNull BigDecimal z) {
+            this(new ASTLiteralNumber(x), new ASTLiteralNumber(y), new ASTLiteralNumber(z));
+        }
+
+        public Vector3D(@NotNull BigDecimal value) {
+            this(value, value, value);
+        }
+
         @Contract("_, _ -> new")
         public @NotNull Vector3D add(@NotNull Context context, @NotNull Vector3D other) {
             return vectorOperation(context, BigDecimal::add, "+", this, other);
