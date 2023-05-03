@@ -103,7 +103,12 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
                     return new ASTLiteralNumber(numberOperator.apply((BigDecimal) left, (BigDecimal) right));
                 }
 
-            return new ASTGroup<>(new ASTString(context.left().visit(context) + context.operator().value + context.right().visit(context)));
+            final ASTString string = new ASTString(context.left().visit(context) +
+                    context.operator().value +
+                    context.right().visit(context));
+
+            if (left instanceof String || right instanceof String) return string;
+            else return new ASTGroup<>(string);
         }
 
         private static ASTVector.Vector3D toVector(Object object) {

@@ -186,6 +186,18 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             } else if (current.type() == TokenType.MINUS && peek().spacing() == Spacing.NONE) {
                 eat(TokenType.MINUS);
                 return new ASTUnaryOperator<>(factor(), TokenType.MINUS, UnaryOperation.SUBTRACTION);
+            } else if (current.type() == TokenType.VARIABLE) {
+                final String value = current.value();
+                eat(TokenType.VARIABLE);
+
+                if (!value.matches("\\{.+}"))
+                    throw new ParseException(lexer, parser.script(), "Malformed variable");
+
+                if (value.charAt(1) == '@') {
+                    return new ASTOptionReference(value.substring(2, value.length() - 1));
+                } else {
+                    return new ASTVariableReference(value.substring(1, value.length() - 1));
+                }
             }
 
             final Token current = this.current;
@@ -262,26 +274,10 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
         private @NotNull ASTNode element(@NotNull List<TokenType> closers) {
             final List<ASTNode> nodes = new ArrayList<>();
             while (!closers.contains(current.type())) {
-                if (current.type() == TokenType.VARIABLE) {
-                    if (!current.value().matches("\\{.+}"))
-                        throw new ParseException(lexer, parser.script(), "Malformed variable");
+                if (current.spacing() == Spacing.LEFT)
+                    nodes.add(new ASTString(" "));
 
-                    if (current.value().charAt(1) == '@') {
-                        if (current.spacing() == Spacing.LEFT)
-                            nodes.add(new ASTString(" "));
-                        nodes.add(new ASTOptionReference(current.value().substring(2, current.value().length() - 1)));
-                    } else {
-                        if (current.spacing() == Spacing.LEFT)
-                            nodes.add(new ASTString(" "));
-                        nodes.add(new ASTVariableReference(current.value().substring(1, current.value().length() - 1)));
-                    }
-
-                    eat(TokenType.VARIABLE);
-                } else {
-                    if (current.spacing() == Spacing.LEFT)
-                        nodes.add(new ASTString(" "));
-                    nodes.add(sum());
-                }
+                nodes.add(sum());
             }
             if (ifEat(closers.toArray(TokenType[]::new)) == null)
                 throw new ParseException(lexer, parser.script(), closers, current.type());
