@@ -1,33 +1,34 @@
 package nl.kiipdevelopment.sklectern.ast.structure;
 
-import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
 import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
 import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ApiStatus.Internal
-public record ASTStructureEntry(ASTNode key, ASTNode node) implements ASTStatement {
-    @Override
-    public @NotNull ASTNode shake() {
-        final ASTNode node = this.node.shake();
-        if (node instanceof ASTEmpty) return new ASTEmpty();
-        else return new ASTStructureEntry(key, node);
-    }
+@ApiStatus.NonExtendable
+public interface ASTStructureEntry extends ASTStatement {
+    @Nullable ASTNode key();
+
+    @NotNull ASTNode node();
 
     @Override
-    public void check(@NotNull Context context) {
+    default void check(@NotNull Context context) {
+        final ASTNode key = key();
         if (key != null) key.check(context);
-        node.check(context);
+        node().check(context);
     }
 
     @Override
-    public @NotNull List<String> get(@NotNull Context context) {
-        final String key = this.key == null ? null : this.key.visit(context);
+    default @NotNull List<String> get(@NotNull Context context) {
+        final ASTNode keyNode = key();
+        final ASTNode node = node();
+        final String key = keyNode == null ? null : keyNode.visit(context);
         final String prefix = key == null ? "" : key + ":";
         if (node instanceof ASTStatement statement) {
             final List<String> list = new ArrayList<>(statement.get(context)

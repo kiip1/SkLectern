@@ -1,9 +1,9 @@
 package nl.kiipdevelopment.sklectern.parser;
 
-import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
-import nl.kiipdevelopment.sklectern.ast.statement.ASTTransform;
-import nl.kiipdevelopment.sklectern.ast.structure.ASTStruct;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTEntryTransform;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureImpl;
 import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,17 +26,17 @@ public record StructureMacro(String name, List<String> parameters, ASTStructure 
     }
 
     public @NotNull ASTStructure apply(@NotNull List<String> arguments) {
-        final List<ASTStatement> results = new ArrayList<>();
+        final List<ASTStructureEntry> results = new ArrayList<>();
         final Map<String, String> replacer = new HashMap<>();
         for (int i = 0; i < parameters.size(); i++)
             replacer.put("$" + parameters.get(i), arguments.get(i));
-        for (ASTStatement entry : structure.entries())
-            results.add(new ASTTransform(entry, replacer));
+        for (ASTStructureEntry entry : structure.entries())
+            results.add(new ASTEntryTransform(entry, replacer));
 
         String name = structure.name();
         for (Map.Entry<String, String> entry : replacer.entrySet())
             name = name.replace(entry.getKey(), entry.getValue());
 
-        return new ASTStruct(name, results);
+        return new ASTStructureImpl(name, results);
     }
 }

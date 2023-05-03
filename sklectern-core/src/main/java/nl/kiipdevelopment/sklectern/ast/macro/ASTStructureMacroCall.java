@@ -1,8 +1,10 @@
 package nl.kiipdevelopment.sklectern.ast.macro;
 
-import nl.kiipdevelopment.sklectern.ast.*;
-import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
+import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
+import nl.kiipdevelopment.sklectern.ast.ASTNode;
+import nl.kiipdevelopment.sklectern.ast.ASTNodeList;
 import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.parser.ParseException;
 import nl.kiipdevelopment.sklectern.parser.StructureMacro;
@@ -46,7 +48,7 @@ public record ASTStructureMacroCall(String name, ASTNodeList arguments) implemen
     }
 
     @Override
-    public @NotNull List<ASTStatement> entries() {
+    public @NotNull List<ASTStructureEntry> entries() {
         return List.of();
     }
 }

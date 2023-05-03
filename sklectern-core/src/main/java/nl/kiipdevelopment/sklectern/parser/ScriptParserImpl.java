@@ -5,6 +5,7 @@ import nl.kiipdevelopment.sklectern.ast.statement.ASTEffect;
 import nl.kiipdevelopment.sklectern.ast.statement.ASTSection;
 import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
 import nl.kiipdevelopment.sklectern.ast.statement.ASTStatementList;
+import nl.kiipdevelopment.sklectern.ast.structure.*;
 import nl.kiipdevelopment.sklectern.ast.value.*;
 import nl.kiipdevelopment.sklectern.ast.value.ASTBinaryOperator.BinaryOperation;
 import nl.kiipdevelopment.sklectern.ast.macro.ASTMacro;
@@ -13,10 +14,6 @@ import nl.kiipdevelopment.sklectern.ast.macro.ASTStructureMacro;
 import nl.kiipdevelopment.sklectern.ast.macro.ASTStructureMacroCall;
 import nl.kiipdevelopment.sklectern.ast.option.ASTOptionReference;
 import nl.kiipdevelopment.sklectern.ast.option.ASTOptions;
-import nl.kiipdevelopment.sklectern.ast.structure.ASTStruct;
-import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
-import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
-import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureList;
 import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 import nl.kiipdevelopment.sklectern.lexer.Token;
 import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
@@ -105,13 +102,13 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             final int indentation = indent();
             // TODO Don't hardcode this
             if (name.toString().startsWith("command")) { // Structure
-                List<ASTStatement> entries = new ArrayList<>();
+                List<ASTStructureEntry> entries = new ArrayList<>();
                 do entries.add(entry());
                 while (this.indentation == indentation);
 
-                return new ASTStruct(name.toString(), entries);
+                return new ASTStructureImpl(name.toString(), entries);
             } else { // Trigger
-                return new ASTStruct(name.toString(), List.of(new ASTStructureEntry(null, statementList())));
+                return new ASTStructureImpl(name.toString(), List.of(new ASTStructureEntryImpl(null, statementList())));
             }
         }
 
@@ -143,7 +140,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             eat(TokenType.IDENTIFIER);
             eat(TokenType.COLON);
             eat(TokenType.END);
-            List<ASTStatement> entries = new ArrayList<>();
+            List<ASTStructureEntry> entries = new ArrayList<>();
             final int indentation = indent();
             do entries.add(entry());
             while (this.indentation >= indentation);
@@ -157,8 +154,8 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                 throw new ParseException(lexer, parser.script(), TokenType.COLON, TokenType.END);
             final boolean statementList = ifEat(TokenType.END);
 
-            if (statementList) return new ASTStructureEntry(key, statementList());
-            else return new ASTStructureEntry(key, element(List.of(TokenType.END)));
+            if (statementList) return new ASTStructureEntryImpl(key, statementList());
+            else return new ASTStructureEntryImpl(key, element(List.of(TokenType.END)));
         }
 
         private @NotNull ASTStatementList statementList() {

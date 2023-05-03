@@ -1,8 +1,9 @@
 package nl.kiipdevelopment.sklectern.ast.macro;
 
+import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
 import nl.kiipdevelopment.sklectern.ast.ASTNode;
-import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
 import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.parser.StructureMacro;
 import org.jetbrains.annotations.ApiStatus;
@@ -18,7 +19,10 @@ public record ASTStructureMacro(String name, List<String> arguments, ASTStructur
 
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTStructureMacro(name, arguments, (ASTStructure) structure.shake());
+        final ASTNode node = structure.shake();
+        if (node instanceof ASTEmpty) return new ASTEmpty();
+        else if (!(node instanceof ASTStructure newStructure)) return new ASTEmpty();
+        else return new ASTStructureMacro(name, arguments, newStructure);
     }
 
     @Override
@@ -33,7 +37,7 @@ public record ASTStructureMacro(String name, List<String> arguments, ASTStructur
     }
 
     @Override
-    public @NotNull List<ASTStatement> entries() {
+    public @NotNull List<ASTStructureEntry> entries() {
         return List.of();
     }
 }

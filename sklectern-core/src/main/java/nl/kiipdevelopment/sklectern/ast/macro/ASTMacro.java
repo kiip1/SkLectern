@@ -4,6 +4,7 @@ import nl.kiipdevelopment.sklectern.ast.ASTEmpty;
 import nl.kiipdevelopment.sklectern.ast.ASTNode;
 import nl.kiipdevelopment.sklectern.ast.statement.ASTStatement;
 import nl.kiipdevelopment.sklectern.ast.structure.ASTStructure;
+import nl.kiipdevelopment.sklectern.ast.structure.ASTStructureEntry;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.parser.Macro;
 import org.jetbrains.annotations.ApiStatus;
@@ -20,7 +21,6 @@ public record ASTMacro(String name, List<String> arguments, ASTStatement stateme
     @Override
     public @NotNull ASTNode shake() {
         final ASTNode statements = this.statements.shake();
-
         if (statements instanceof ASTEmpty) return new ASTEmpty();
         else if (!(statements instanceof ASTStatement statement)) return new ASTEmpty();
         else return new ASTMacro(name, arguments, statement);
@@ -38,7 +38,7 @@ public record ASTMacro(String name, List<String> arguments, ASTStatement stateme
     }
 
     @Override
-    public @NotNull List<ASTStatement> entries() {
+    public @NotNull List<ASTStructureEntry> entries() {
         return List.of();
     }
 }
