@@ -13,7 +13,9 @@ public record ASTGroup<T>(ASTNode node) implements ASTValue<T>, ASTNode {
 
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTGroup<>(node.shake());
+        final ASTNode node = this.node.shake();
+        if (node instanceof ASTEmpty) return new ASTEmpty();
+        return new ASTGroup<>(node);
     }
 
     @Override

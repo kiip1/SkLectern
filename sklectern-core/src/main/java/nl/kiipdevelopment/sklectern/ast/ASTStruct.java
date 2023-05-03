@@ -16,11 +16,13 @@ public record ASTStruct(String name, List<ASTStatement> entries) implements ASTS
 
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTStruct(name, entries.stream()
+        final List<ASTStatement> entries = this.entries.stream()
                 .map(ASTNode::shake)
                 .filter(entry -> !(entry instanceof ASTEmpty))
                 .map(entry -> (ASTStatement) entry)
-                .toList());
+                .toList();
+        if (entries.isEmpty()) return new ASTEmpty();
+        else return new ASTStruct(name, entries);
     }
 
     @Override

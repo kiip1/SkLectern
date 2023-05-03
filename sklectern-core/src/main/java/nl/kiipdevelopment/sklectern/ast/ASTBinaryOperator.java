@@ -90,19 +90,18 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
         ) {
             final Object left = context.left() instanceof ASTValue<?> value ? value.value(context) : null;
             final Object right = context.right() instanceof ASTValue<?> value ? value.value(context) : null;
-            if (left == null || right == null)
-                throw new ParseException("Attempted " + name + " on " + context.left() + " and " + context.right());
 
-            if (left instanceof ASTVector.Vector3D || right instanceof ASTVector.Vector3D) {
-                ASTVector.Vector3D leftVector = toVector(left);
-                ASTVector.Vector3D rightVector = toVector(right);
-                if (leftVector != null && rightVector != null)
-                    return new ASTLiteralVector(vectorOperator.apply(leftVector, rightVector));
-            } else if (left instanceof BigDecimal && right instanceof BigDecimal) {
-                if (context.operator().name().startsWith("VECTOR"))
-                    throw new ParseException("Number math with vector operators is not supported");
-                return new ASTLiteralNumber(numberOperator.apply((BigDecimal) left, (BigDecimal) right));
-            }
+            if (left != null && right != null)
+                if (left instanceof ASTVector.Vector3D || right instanceof ASTVector.Vector3D) {
+                    ASTVector.Vector3D leftVector = toVector(left);
+                    ASTVector.Vector3D rightVector = toVector(right);
+                    if (leftVector != null && rightVector != null)
+                        return new ASTLiteralVector(vectorOperator.apply(leftVector, rightVector));
+                } else if (left instanceof BigDecimal && right instanceof BigDecimal) {
+                    if (context.operator().name().startsWith("VECTOR"))
+                        throw new ParseException("Number math with vector operators is not supported");
+                    return new ASTLiteralNumber(numberOperator.apply((BigDecimal) left, (BigDecimal) right));
+                }
 
             return new ASTGroup<>(new ASTString(context.left().visit(context) + context.operator().value + context.right().visit(context)));
         }

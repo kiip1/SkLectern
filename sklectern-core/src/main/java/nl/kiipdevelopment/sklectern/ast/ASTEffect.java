@@ -10,7 +10,9 @@ import java.util.List;
 public record ASTEffect(ASTNode node) implements ASTStatement {
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTEffect(node.shake());
+        final ASTNode node = this.node.shake();
+        if (node instanceof ASTEmpty) return new ASTEmpty();
+        return new ASTEffect(node);
     }
 
     @Override

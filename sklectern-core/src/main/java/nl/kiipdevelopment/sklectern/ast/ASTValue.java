@@ -10,12 +10,12 @@ public interface ASTValue<T> extends ASTNode {
     T value(@NotNull Context context);
 
     @Override
-    default void check(@NotNull Context context) {}
-
-    @Override
     default @NotNull ASTNode shake() {
         return this;
     }
+
+    @Override
+    default void check(@NotNull Context context) {}
 
     @Override
     default @NotNull String visit(@NotNull Context context) {
