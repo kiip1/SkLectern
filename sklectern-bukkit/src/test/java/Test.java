@@ -16,7 +16,7 @@ final class Test {
         ResourceUtils.extractResource("scripts", MockBukkit.getMock()
                 .getPluginsFolder()
                 .toPath()
-                .resolve("SkLectern-1.0.3-alpha")
+                .resolve("SkLectern-1.0.4-alpha")
                 .resolve("scripts"));
 
         MockBukkit.load(BukkitSkLectern.class);
