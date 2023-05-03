@@ -12,11 +12,11 @@ import java.util.List;
 public record ASTStructureMacroCall(String name, ASTNodeList arguments) implements ASTStructure {
     @Override
     public @NotNull ASTNode shake() {
-        final ASTNode node = this.arguments.shake();
-        if (node instanceof ASTEmpty) return new ASTEmpty();
-        else if (!(node instanceof ASTNodeList args)) return new ASTStructureMacroCall(name,
-                new ASTNodeList(List.of(node)));
-        else return new ASTStructureMacroCall(name, args);
+        return new ASTStructureMacroCall(name, new ASTNodeList(arguments.nodes()
+                .stream()
+                .map(ASTNode::shake)
+                .filter(node -> !(node instanceof ASTEmpty))
+                .toList()));
     }
 
     @Override

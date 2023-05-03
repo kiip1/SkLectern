@@ -4,18 +4,17 @@ import nl.kiipdevelopment.sklectern.context.Context;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @ApiStatus.Internal
 public record ASTFunctionCall(String name, ASTNodeList arguments) implements ASTNode {
     @Override
     public @NotNull ASTNode shake() {
-        final ASTNode node = this.arguments.shake();
-        if (node instanceof ASTEmpty) return new ASTEmpty();
-        else if (!(node instanceof ASTNodeList args)) return new ASTFunctionCall(name,
-                new ASTNodeList(List.of(node)));
-        else return new ASTFunctionCall(name, args);
+        return new ASTFunctionCall(name, new ASTNodeList(arguments.nodes()
+                .stream()
+                .map(ASTNode::shake)
+                .filter(node -> !(node instanceof ASTEmpty))
+                .toList()));
     }
 
     @Override
