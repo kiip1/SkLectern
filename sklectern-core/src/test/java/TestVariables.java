@@ -39,8 +39,8 @@ final class TestVariables {
 
         Assertions.assertEquals("""
         on chat:
-        	send {_a} + 5 to player
-        	send {l} - 3 to player
+        	send ({_a} + 5) to player
+        	send ({l} - 3) to player
         """.trim(), script.transform().trim());
 
         Assertions.assertThrows(ParseException.class, () -> {
