@@ -30,7 +30,7 @@ public record ASTStructureEntry(ASTNode key, ASTNode node) implements ASTStateme
             final List<String> list = new ArrayList<>(statement.get(context)
                     .stream()
                     .map(line -> (key == null ? "" : "\t") + line).toList());
-            if (key != null) list.add(prefix);
+            if (key != null) list.add(0, prefix);
 
             return list;
         } else return List.of(prefix + node.visit(context));
