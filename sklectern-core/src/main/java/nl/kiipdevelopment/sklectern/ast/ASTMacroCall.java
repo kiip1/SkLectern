@@ -9,14 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @ApiStatus.Internal
-public record ASTMacroReference(String name, ASTNodeList arguments) implements ASTStatement {
+public record ASTMacroCall(String name, ASTNodeList arguments) implements ASTStatement {
     @Override
     public @NotNull ASTNode shake() {
         final ASTNode node = this.arguments.shake();
         if (node instanceof ASTEmpty) return new ASTEmpty();
-        else if (!(node instanceof ASTNodeList args)) return new ASTMacroReference(name,
+        else if (!(node instanceof ASTNodeList args)) return new ASTMacroCall(name,
                 new ASTNodeList(List.of(node)));
-        else return new ASTMacroReference(name, args);
+        else return new ASTMacroCall(name, args);
     }
 
     @Override

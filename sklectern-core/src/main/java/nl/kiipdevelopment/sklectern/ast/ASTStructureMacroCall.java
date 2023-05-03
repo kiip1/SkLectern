@@ -9,14 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @ApiStatus.Internal
-public record ASTStructureMacroReference(String name, ASTNodeList arguments) implements ASTStructure {
+public record ASTStructureMacroCall(String name, ASTNodeList arguments) implements ASTStructure {
     @Override
     public @NotNull ASTNode shake() {
         final ASTNode node = this.arguments.shake();
         if (node instanceof ASTEmpty) return new ASTEmpty();
-        else if (!(node instanceof ASTNodeList args)) return new ASTStructureMacroReference(name,
+        else if (!(node instanceof ASTNodeList args)) return new ASTStructureMacroCall(name,
                 new ASTNodeList(List.of(node)));
-        else return new ASTStructureMacroReference(name, args);
+        else return new ASTStructureMacroCall(name, args);
     }
 
     @Override

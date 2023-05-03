@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ApiStatus.Internal
-public record ASTFunctionReference(String name, ASTNodeList arguments) implements ASTNode {
+public record ASTFunctionCall(String name, ASTNodeList arguments) implements ASTNode {
     @Override
     public @NotNull ASTNode shake() {
         final ASTNode node = this.arguments.shake();
         if (node instanceof ASTEmpty) return new ASTEmpty();
-        else if (!(node instanceof ASTNodeList args)) return new ASTFunctionReference(name,
+        else if (!(node instanceof ASTNodeList args)) return new ASTFunctionCall(name,
                 new ASTNodeList(List.of(node)));
-        else return new ASTFunctionReference(name, args);
+        else return new ASTFunctionCall(name, args);
     }
 
     @Override

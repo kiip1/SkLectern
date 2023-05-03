@@ -76,7 +76,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     arguments.add(element(List.of(TokenType.COMMA, TokenType.PARENTHESIS_CLOSE)));
                 eat(TokenType.END);
 
-                return new ASTStructureMacroReference(name, new ASTNodeList(arguments));
+                return new ASTStructureMacroCall(name, new ASTNodeList(arguments));
             }
 
             final StringBuilder name = new StringBuilder();
@@ -167,7 +167,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     arguments.add(element(List.of(TokenType.COMMA, TokenType.PARENTHESIS_CLOSE)));
                 eat(TokenType.END);
 
-                return new ASTMacroReference(name, new ASTNodeList(arguments));
+                return new ASTMacroCall(name, new ASTNodeList(arguments));
             }
 
             final ASTNode node = element(List.of(TokenType.END, TokenType.COLON));
@@ -203,7 +203,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     final List<ASTNode> arguments = new ArrayList<>();
                     while (previous.type() != TokenType.PARENTHESIS_CLOSE)
                         arguments.add(element(List.of(TokenType.COMMA, TokenType.PARENTHESIS_CLOSE)));
-                    return new ASTFunctionReference(name, new ASTNodeList(arguments));
+                    return new ASTFunctionCall(name, new ASTNodeList(arguments));
                 }
             } else return new ASTString(current.value());
         }
