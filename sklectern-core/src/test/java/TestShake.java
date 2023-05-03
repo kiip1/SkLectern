@@ -7,6 +7,17 @@ final class TestShake {
         final Script script = new Script("shake", """
         on join:
             send "hi"
+        
+        on disconnect:
+        on disconnect:
+        on disconnect:
+        on join:
+            send "hi"
+        on disconnect:
+        on disconnect:
+        
+        on join:
+            send "hi"
         """);
 
         System.out.println(script.parse());

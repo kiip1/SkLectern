@@ -7,6 +7,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static com.google.common.io.MoreFiles.getNameWithoutExtension;
+
 public final class Main {
     public static void main(String[] args) {
         Path file = null;
@@ -18,7 +20,7 @@ public final class Main {
             } else if (arg.equalsIgnoreCase("b") || arg.equalsIgnoreCase("build")) {
                 if (folder != null) {
                     try {
-                        SkLectern.instance().scriptManager().transformAll(folder);
+                        SkLectern.instance().scriptManager().transformAll(folder, folder);
                     } catch (UncheckedIOException e) {
                         if (e.getCause() instanceof NoSuchFileException noSuchFileException)
                             System.err.println("Couldn't find folder " + noSuchFileException.getFile());
@@ -34,7 +36,8 @@ public final class Main {
                 }
 
                 try {
-                    SkLectern.instance().scriptManager().transform(file);
+                    SkLectern.instance().scriptManager().transform(file,
+                            file.resolveSibling(getNameWithoutExtension(file.getFileName()) + ".l.sk"));
                 } catch (UncheckedIOException e) {
                     if (e.getCause() instanceof NoSuchFileException noSuchFileException)
                         System.err.println("Couldn't find file " + noSuchFileException.getFile());

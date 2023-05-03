@@ -13,6 +13,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
+import static com.google.common.io.MoreFiles.getNameWithoutExtension;
 import static mx.kenzie.centurion.CommandResult.*;
 
 @ApiStatus.Internal
@@ -48,7 +49,7 @@ public final class SkLecternCommand extends MinecraftCommand {
                 }).arg("build", PathArgument.path(SkLectern.instance().config().scriptFolder()), (sender, arguments) -> {
                     try {
                         final Path file = arguments.get(0);
-                        SkLectern.instance().scriptManager().transform(file);
+                        SkLectern.instance().scriptManager().transform(file, file.resolveSibling(getNameWithoutExtension(file.getFileName()) + ".l.sk"));
                         sender.sendMessage(Component.text("Success", NamedTextColor.GREEN));
                     } catch (ParseException e) {
                         sender.sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));

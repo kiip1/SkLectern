@@ -29,17 +29,14 @@ public record Script(String name, String source) {
     public ASTNode parse() {
         if (source.isBlank()) return new ASTEmpty();
 
-        ScriptLexer lexer = ScriptLexer.of(source);
-        ScriptParser parser = ScriptParser.of(lexer);
-
-        return parser.instance()
-                .parse()
-                .shake();
+        final ScriptLexer lexer = ScriptLexer.of(source);
+        final ScriptParser parser = ScriptParser.of(lexer);
+        return parser.instance().parse().shake();
     }
 
     public String transform() {
-        ASTNode node = parse();
-        Context context = Context.of();
+        final ASTNode node = parse();
+        final Context context = Context.of();
         node.check(context);
         return node.visit(context);
     }

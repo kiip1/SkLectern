@@ -92,7 +92,7 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             if (name.toString().startsWith("command")) { // Structure
                 List<ASTStatement> entries = new ArrayList<>();
                 do entries.add(entry());
-                while (this.indentation >= indentation);
+                while (this.indentation == indentation);
 
                 return new ASTStruct(name.toString(), entries);
             } else { // Trigger
@@ -148,9 +148,10 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
 
         private @NotNull ASTStatementList statementList() {
             final int indentation = indent();
+            if (indentation == 0) return new ASTStatementList(List.of());
             final List<ASTStatement> statements = new ArrayList<>();
-            do statements.add(statement());
-            while (this.indentation >= indentation);
+            while (this.indentation == indentation)
+                statements.add(statement());
 
             return new ASTStatementList(statements);
         }
@@ -190,12 +191,20 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             final Token current = this.current;
             next();
             if (current.type() == TokenType.NUMBER) return new ASTLiteralNumber(new BigDecimal(current.value()));
-            else if (current.value().equals("vector")) {
+            else if (current.type() == TokenType.IDENTIFIER && this.current.type() == TokenType.PARENTHESIS_OPEN && this.current.spacing() == Spacing.NONE) {
+                final String name = current.value();
                 eat(TokenType.PARENTHESIS_OPEN);
-                final ASTNode x = element(List.of(TokenType.COMMA));
-                final ASTNode y = element(List.of(TokenType.COMMA));
-                final ASTNode z = element(List.of(TokenType.PARENTHESIS_CLOSE));
-                return new ASTLiteralVector(x, y, z);
+                if (name.equals("vector")) {
+                    final ASTNode x = element(List.of(TokenType.COMMA));
+                    final ASTNode y = element(List.of(TokenType.COMMA));
+                    final ASTNode z = element(List.of(TokenType.PARENTHESIS_CLOSE));
+                    return new ASTLiteralVector(x, y, z);
+                } else {
+                    final List<ASTNode> arguments = new ArrayList<>();
+                    while (previous.type() != TokenType.PARENTHESIS_CLOSE)
+                        arguments.add(element(List.of(TokenType.COMMA, TokenType.PARENTHESIS_CLOSE)));
+                    return new ASTFunctionReference(name, new ASTNodeList(arguments));
+                }
             } else return new ASTString(current.value());
         }
 

@@ -1,8 +1,6 @@
 import be.seeseemelk.mockbukkit.MockBukkit;
 import nl.kiipdevelopment.sklectern.BukkitSkLectern;
-import nl.kiipdevelopment.sklectern.Script;
 import nl.kiipdevelopment.sklectern.SkLectern;
-import nl.kiipdevelopment.sklectern.lexer.ScriptLexer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,18 +21,18 @@ final class Test {
 
         MockBukkit.load(BukkitSkLectern.class);
 
-        final Script script = new Script(SkLectern.instance()
-                .config()
-                .scriptFolder()
-                .resolve("arithmetic.lsk"));
-
-        ScriptLexer.of(script.source())
-                .instance()
-                .iterator()
-                .forEachRemaining(System.out::println);
-
-        System.out.println(script.parse());
-        System.out.println(script.transform());
+//        final Script script = new Script(SkLectern.instance()
+//                .config()
+//                .scriptFolder()
+//                .resolve("arithmetic.lsk"));
+//
+//        ScriptLexer.of(script.source())
+//                .instance()
+//                .iterator()
+//                .forEachRemaining(System.out::println);
+//
+//        System.out.println(script.parse());
+//        System.out.println(script.transform());
 
         try (
                 Stream<Path> stream = Files.list(SkLectern.instance().config().distributionFolder());
@@ -42,8 +40,6 @@ final class Test {
         ) {
             for (Path path : stream.toList())
                 writer.write("Script " + path + ":\n" + Files.readString(path) + "\n");
-
-            writer.flush();
         }
 
         MockBukkit.unmock();
