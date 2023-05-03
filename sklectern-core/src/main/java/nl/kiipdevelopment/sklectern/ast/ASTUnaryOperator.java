@@ -2,6 +2,7 @@ package nl.kiipdevelopment.sklectern.ast;
 
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.context.MathContext;
+import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
 import nl.kiipdevelopment.sklectern.lexer.TokenType;
 import nl.kiipdevelopment.sklectern.parser.ParseException;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,10 +12,10 @@ import java.math.BigDecimal;
 import java.util.function.Function;
 
 @ApiStatus.Internal
-public record ASTUnaryOperator<T>(ASTNode node, TokenType operator, UnaryOperation operation) implements ASTValue<T> {
+public record ASTUnaryOperator<T>(ASTNode node, TokenType operator, UnaryOperation operation, Spacing spacing) implements ASTValue<T> {
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTUnaryOperator<>(node.shake(), operator, operation);
+        return new ASTUnaryOperator<>(node.shake(), operator, operation, spacing);
     }
 
     @Override
@@ -33,7 +34,7 @@ public record ASTUnaryOperator<T>(ASTNode node, TokenType operator, UnaryOperati
     }
 
     public @NotNull ASTValue<?> apply(@NotNull Context context) {
-        return operation.apply(context, node, operator);
+        return operation.apply(MathContext.of(context.copy(), node, null, operator, spacing));
     }
 
     public enum UnaryOperation {
@@ -56,14 +57,16 @@ public record ASTUnaryOperator<T>(ASTNode node, TokenType operator, UnaryOperati
             this.unaryOperator = unaryOperator;
         }
 
-        public @NotNull ASTValue<?> apply(@NotNull Context context, @NotNull ASTNode input, @NotNull TokenType operator) {
-            if (input instanceof ASTBinaryOperator<?> inputOperator)
-                return apply(context, inputOperator.apply(context), operator);
+        public @NotNull ASTValue<?> apply(@NotNull MathContext context) {
+            if (context.left() instanceof ASTBinaryOperator<?> inputOperator)
+                return apply(MathContext.of(context, inputOperator.apply(context), null,
+                        context.operator(), context.spacing()));
 
-            if (input instanceof ASTUnaryOperator<?> inputOperator)
-                return apply(context, inputOperator.apply(context), operator);
+            if (context.left() instanceof ASTUnaryOperator<?> inputOperator)
+                return apply(MathContext.of(context, inputOperator.apply(context), null,
+                        context.operator(), context.spacing()));
 
-            return unaryOperator.apply(MathContext.of(context.copy(), input, null, operator));
+            return unaryOperator.apply(context);
         }
     }
 }

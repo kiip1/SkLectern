@@ -36,7 +36,9 @@ public record Token(@NotNull TokenType type, @NotNull String value, @NotNull Spa
     @ApiStatus.Internal
     public enum Spacing {
         NONE(Function.identity()),
-        LEFT(input -> " " + input);
+        LEFT(input -> " " + input),
+        RIGHT(input -> input + " "),
+        BOTH(input -> " " + input + " ");
 
         private final Function<String, String> applier;
 

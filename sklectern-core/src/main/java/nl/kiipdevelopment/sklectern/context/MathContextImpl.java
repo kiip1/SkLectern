@@ -1,6 +1,7 @@
 package nl.kiipdevelopment.sklectern.context;
 
 import nl.kiipdevelopment.sklectern.ast.ASTNode;
+import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
 import nl.kiipdevelopment.sklectern.lexer.TokenType;
 import nl.kiipdevelopment.sklectern.parser.Macro;
 import nl.kiipdevelopment.sklectern.parser.StructureMacro;
@@ -16,12 +17,14 @@ final class MathContextImpl implements MathContext {
     private final ASTNode left;
     private final ASTNode right;
     private final TokenType operator;
+    private final Spacing spacing;
 
-    public MathContextImpl(Context context, ASTNode left, ASTNode right, TokenType operator) {
+    public MathContextImpl(Context context, ASTNode left, ASTNode right, TokenType operator, Spacing spacing) {
         this.context = context;
         this.left = left;
         this.right = right;
         this.operator = operator;
+        this.spacing = spacing;
     }
 
     @Override
@@ -37,6 +40,11 @@ final class MathContextImpl implements MathContext {
     @Override
     public @NotNull TokenType operator() {
         return operator;
+    }
+
+    @Override
+    public @NotNull Spacing spacing() {
+        return spacing;
     }
 
     @Override

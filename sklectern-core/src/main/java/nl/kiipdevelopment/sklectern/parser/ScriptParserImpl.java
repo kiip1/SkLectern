@@ -184,8 +184,9 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                 final ASTNode node = element(List.of(TokenType.PARENTHESIS_CLOSE));
                 return new ASTGroup<>(node);
             } else if (current.type() == TokenType.MINUS && peek().spacing() == Spacing.NONE) {
+                final Spacing spacing = current.spacing();
                 eat(TokenType.MINUS);
-                return new ASTUnaryOperator<>(factor(), TokenType.MINUS, UnaryOperation.SUBTRACTION);
+                return new ASTUnaryOperator<>(factor(), TokenType.MINUS, UnaryOperation.SUBTRACTION, spacing);
             } else if (current.type() == TokenType.VARIABLE) {
                 final String value = current.value();
                 eat(TokenType.VARIABLE);
@@ -224,8 +225,14 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             ASTNode node = factor();
 
             while (current.type() == TokenType.EXPONENT) {
+                // "spacing" can only be NONE (0), NONE --> LEFT
+                int spacing = current.spacing().ordinal();
+
                 eat(TokenType.EXPONENT);
-                node = new ASTBinaryOperator<>(node, factor(), TokenType.EXPONENT, BinaryOperation.EXPONENTIATION);
+
+                // "spacing" can either NONE (0) or LEFT (1), NONE --> RIGHT, LEFT --> BOTH
+                spacing += current.spacing().ordinal() * 2;
+                node = new ASTBinaryOperator<>(node, factor(), TokenType.EXPONENT, BinaryOperation.EXPONENTIATION, Spacing.values()[spacing]);
             }
 
             return node;
@@ -237,6 +244,10 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             while (current.type() == TokenType.MULTIPLY || current.type() == TokenType.VECTOR_MULTIPLY || current.type() == TokenType.DIVIDE || current.type() == TokenType.VECTOR_DIVIDE) {
                 final TokenType type;
                 final BinaryOperation operator;
+
+                // "spacing" can only be NONE (0), NONE --> LEFT
+                int spacing = current.spacing().ordinal();
+
                 if (current.type() == TokenType.MULTIPLY || current.type() == TokenType.VECTOR_MULTIPLY) {
                     type = eat(TokenType.MULTIPLY, TokenType.VECTOR_MULTIPLY);
                     operator = BinaryOperation.MULTIPLICATION;
@@ -245,7 +256,9 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     operator = BinaryOperation.DIVISION;
                 }
 
-                node = new ASTBinaryOperator<>(node, power(), type, operator);
+                // "spacing" can either NONE (0) or LEFT (1), NONE --> RIGHT, LEFT --> BOTH
+                spacing += current.spacing().ordinal() * 2;
+                node = new ASTBinaryOperator<>(node, power(), type, operator, Spacing.values()[spacing]);
             }
 
             return node;
@@ -257,6 +270,10 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
             while (current.type() == TokenType.PLUS || current.type() == TokenType.VECTOR_PLUS || current.type() == TokenType.MINUS || current.type() == TokenType.VECTOR_MINUS) {
                 final TokenType type;
                 final BinaryOperation operator;
+
+                // "spacing" can only be NONE (0), NONE --> LEFT
+                int spacing = current.spacing().ordinal();
+
                 if (current.type() == TokenType.PLUS || current.type() == TokenType.VECTOR_PLUS) {
                     type = eat(TokenType.PLUS, TokenType.VECTOR_PLUS);
                     operator = BinaryOperation.ADDITION;
@@ -265,7 +282,9 @@ record ScriptParserImpl(ScriptLexer lexer) implements ScriptParser {
                     operator = BinaryOperation.SUBTRACTION;
                 }
 
-                node = new ASTBinaryOperator<>(node, term(), type, operator);
+                // "spacing" can either NONE (0) or LEFT (1), NONE --> RIGHT, LEFT --> BOTH
+                spacing += current.spacing().ordinal() * 2;
+                node = new ASTBinaryOperator<>(node, term(), type, operator, Spacing.values()[spacing]);
             }
 
             return node;

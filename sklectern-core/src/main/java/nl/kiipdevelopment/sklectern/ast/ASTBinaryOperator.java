@@ -3,6 +3,7 @@ package nl.kiipdevelopment.sklectern.ast;
 import ch.obermuhlner.math.big.BigDecimalMath;
 import nl.kiipdevelopment.sklectern.context.Context;
 import nl.kiipdevelopment.sklectern.context.MathContext;
+import nl.kiipdevelopment.sklectern.lexer.Token.Spacing;
 import nl.kiipdevelopment.sklectern.lexer.TokenType;
 import nl.kiipdevelopment.sklectern.parser.ParseException;
 import org.jetbrains.annotations.ApiStatus;
@@ -14,10 +15,10 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 @ApiStatus.Internal
-public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operator, BinaryOperation operation) implements ASTValue<T> {
+public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operator, BinaryOperation operation, Spacing spacing) implements ASTValue<T> {
     @Override
     public @NotNull ASTNode shake() {
-        return new ASTBinaryOperator<>(left.shake(), right.shake(), operator, operation);
+        return new ASTBinaryOperator<>(left.shake(), right.shake(), operator, operation, spacing);
     }
 
     @Override
@@ -37,7 +38,7 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
     }
 
     public ASTValue<?> apply(@NotNull Context context) {
-        return operation.apply(context, left, right, operator);
+        return operation.apply(MathContext.of(context.copy(), left, right, operator, spacing));
     }
 
     public enum BinaryOperation {
@@ -68,20 +69,24 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
             this.binaryOperator = binaryOperator;
         }
 
-        public @NotNull ASTValue<?> apply(@NotNull Context context, @NotNull ASTNode left, @NotNull ASTNode right, @NotNull TokenType operator) {
-            if (left instanceof ASTBinaryOperator<?> leftOperator)
-                return apply(context, leftOperator.apply(context), right, operator);
+        public @NotNull ASTValue<?> apply(@NotNull MathContext context) {
+            if (context.left() instanceof ASTBinaryOperator<?> leftOperator)
+                return apply(MathContext.of(context, leftOperator.apply(context), context.right(),
+                        context.operator(), context.spacing()));
 
-            if (right instanceof ASTBinaryOperator<?> rightOperator)
-                return apply(context, left, rightOperator.apply(context), operator);
+            if (context.right() instanceof ASTBinaryOperator<?> rightOperator)
+                return apply(MathContext.of(context, context.left(), rightOperator.apply(context),
+                        context.operator(), context.spacing()));
 
-            if (left instanceof ASTUnaryOperator<?> leftOperator)
-                return apply(context, leftOperator.apply(context), right, operator);
+            if (context.left() instanceof ASTUnaryOperator<?> leftOperator)
+                return apply(MathContext.of(context, leftOperator.apply(context), context.right(),
+                        context.operator(), context.spacing()));
 
-            if (right instanceof ASTUnaryOperator<?> rightOperator)
-                return apply(context, left, rightOperator.apply(context), operator);
+            if (context.right() instanceof ASTUnaryOperator<?> rightOperator)
+                return apply(MathContext.of(context, context.left(), rightOperator.apply(context),
+                        context.operator(), context.spacing()));
 
-            return binaryOperator.apply(MathContext.of(context.copy(), left, right, operator));
+            return binaryOperator.apply(context);
         }
 
         private static @NotNull ASTValue<?> operation(
@@ -104,9 +109,8 @@ public record ASTBinaryOperator<T>(ASTNode left, ASTNode right, TokenType operat
                 }
 
             final ASTString string = new ASTString(context.left().visit(context) +
-                    context.operator().value +
+                    context.spacing().apply(context.operator().value) +
                     context.right().visit(context));
-
             if (left instanceof String || right instanceof String) return string;
             else return new ASTGroup<>(string);
         }
